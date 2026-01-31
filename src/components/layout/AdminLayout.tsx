@@ -8,7 +8,8 @@ import {
   BarChart3,
   LogOut,
   Menu,
-  X
+  X,
+  Settings as SettingsIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -24,6 +25,8 @@ const navItems = [
   { href: '/admin/patients', icon: Users, label: 'Patients' },
   { href: '/admin/appointments', icon: Calendar, label: 'Appointments' },
   { href: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
+  { href: '/admin/staff', icon: Users, label: 'Staff' },
+  { href: '/admin/settings', icon: SettingsIcon, label: 'Settings' },
 ];
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {

@@ -20,6 +20,8 @@ import Dashboard from "./pages/admin/Dashboard";
 import Patients from "./pages/admin/Patients";
 import Appointments from "./pages/admin/Appointments";
 import Analytics from "./pages/admin/Analytics";
+import Staff from "./pages/admin/Staff";
+import Settings from "./pages/admin/Settings";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +53,12 @@ const App = () => (
               } />
               <Route path="/admin/analytics" element={
                 <ProtectedRoute><Analytics /></ProtectedRoute>
+              } />
+              <Route path="/admin/staff" element={
+                <ProtectedRoute><Staff /></ProtectedRoute>
+              } />
+              <Route path="/admin/settings" element={
+                <ProtectedRoute><Settings /></ProtectedRoute>
               } />
               
               {/* Catch-all */}

@@ -1,10 +1,24 @@
+import { useState } from 'react';
 import { 
   BarChart3, 
   TrendingUp, 
   Users,
-  Calendar
+  Calendar,
+  Download,
+  Filter,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { 
   BarChart, 
@@ -26,6 +40,10 @@ import {
 import { monthlyPatientStats, serviceDistribution, dailyPatientStats } from '@/data/mockData';
 
 const Analytics = () => {
+  const [dateRange, setDateRange] = useState<'week' | 'month' | 'year'>('month');
+  const [startDate, setStartDate] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+
   const weeklyGrowth = [
     { week: 'Week 1', patients: 45, revenue: 12500 },
     { week: 'Week 2', patients: 52, revenue: 14800 },
@@ -33,38 +51,99 @@ const Analytics = () => {
     { week: 'Week 4', patients: 61, revenue: 17500 },
   ];
 
+  const handleExport = (format: 'csv' | 'pdf') => {
+    console.log(`Exporting analytics data as ${format}`);
+    // This would typically call an API to generate the export
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
-            Analytics & Insights
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Track clinic performance and patient trends
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
+              Analytics & Insights
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Track clinic performance and patient trends
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => handleExport('csv')}>
+              <Download className="w-4 h-4" />
+              CSV
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => handleExport('pdf')}>
+              <Download className="w-4 h-4" />
+              PDF
+            </Button>
+          </div>
         </div>
+
+        {/* Date Range Filter */}
+        <Card className="border-border/50">
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Date Range:</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Select value={dateRange} onValueChange={(v: any) => setDateRange(v)}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="week">This Week</SelectItem>
+                    <SelectItem value="month">This Month</SelectItem>
+                    <SelectItem value="year">This Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-32"
+                />
+                <span className="text-sm">to</span>
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-32"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'This Month', value: '285', change: '+15%', icon: Users, color: 'bg-primary/10 text-primary' },
-            { label: 'Last Month', value: '248', change: '', icon: Calendar, color: 'bg-medical-blue/10 text-medical-blue' },
-            { label: 'Avg. Daily', value: '14', change: '+2', icon: TrendingUp, color: 'bg-medical-green/10 text-medical-green' },
-            { label: 'Peak Day', value: 'Sat', change: '25 visits', icon: BarChart3, color: 'bg-medical-coral/10 text-medical-coral' },
+            { label: 'Total Patients', value: '285', change: '+15%', changeType: 'positive', icon: Users, color: 'bg-primary/10 text-primary' },
+            { label: 'Appointments', value: '142', change: '+8%', changeType: 'positive', icon: Calendar, color: 'bg-medical-blue/10 text-medical-blue' },
+            { label: 'Completed', value: '128', change: '+12%', changeType: 'positive', icon: TrendingUp, color: 'bg-medical-green/10 text-medical-green' },
+            { label: 'Pending', value: '14', change: '+2', changeType: 'neutral', icon: BarChart3, color: 'bg-medical-coral/10 text-medical-coral' },
           ].map((stat, idx) => (
             <Card key={idx} className="border-border/50">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
-                  <stat.icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  {stat.change && (
-                    <p className="text-xs text-medical-green">{stat.change}</p>
-                  )}
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">{stat.label}</p>
+                    <p className="text-3xl font-bold mt-1">{stat.value}</p>
+                    <div className={`flex items-center gap-1 mt-2 text-xs ${
+                      stat.changeType === 'positive' ? 'text-medical-green' : 'text-muted-foreground'
+                    }`}>
+                      {stat.changeType === 'positive' && <ArrowUp className="w-3 h-3" />}
+                      <span>{stat.change}</span>
+                    </div>
+                  </div>
+                  <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
+                    <stat.icon className="w-6 h-6" />
+                  </div>
                 </div>
               </CardContent>
             </Card>

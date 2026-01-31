@@ -6,7 +6,13 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  Eye
+  Eye,
+  Plus,
+  Edit2,
+  Trash2,
+  X,
+  AlertCircle,
+  Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,9 +30,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminLayout } from '@/components/layout/AdminLayout';
-import { appointments as initialAppointments, Appointment, services } from '@/data/mockData';
+import { appointments as initialAppointments, Appointment, services, patients } from '@/data/mockData';
 import { useToast } from '@/hooks/use-toast';
 
 const Appointments = () => {
@@ -36,6 +44,16 @@ const Appointments = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [serviceFilter, setServiceFilter] = useState<string>('all');
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
+  const [formData, setFormData] = useState({
+    patientName: '',
+    phone: '',
+    service: '',
+    date: new Date().toISOString().split('T')[0],
+    time: '09:00',
+    message: '',
+  });
 
   const filteredAppointments = appointments.filter(apt => {
     const matchesSearch = apt.patientName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -52,6 +70,78 @@ const Appointments = () => {
       title: `Appointment ${newStatus}`,
       description: `Status updated successfully.`,
     });
+  };
+
+  const handleOpenDialog = (appointment?: Appointment) => {
+    if (appointment) {
+      setEditingAppointment(appointment);
+      setFormData({
+        patientName: appointment.patientName,
+        phone: appointment.phone,
+        service: appointment.service,
+        date: appointment.date,
+        time: appointment.time,
+        message: appointment.message || '',
+      });
+    } else {
+      setEditingAppointment(null);
+      setFormData({
+        patientName: '',
+        phone: '',
+        service: '',
+        date: new Date().toISOString().split('T')[0],
+        time: '09:00',
+        message: '',
+      });
+    }
+    setIsDialogOpen(true);
+  };
+
+  const handleSave = () => {
+    if (!formData.patientName || !formData.phone || !formData.service) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (editingAppointment) {
+      setAppointments(prev => prev.map(apt => 
+        apt.id === editingAppointment.id 
+          ? { 
+              ...apt,
+              patientName: formData.patientName,
+              phone: formData.phone,
+              service: formData.service,
+              date: formData.date,
+              time: formData.time,
+              message: formData.message,
+            }
+          : apt
+      ));
+      toast({ title: "Appointment updated successfully" });
+    } else {
+      const newAppointment: Appointment = {
+        id: String(Date.now()),
+        patientName: formData.patientName,
+        phone: formData.phone,
+        service: formData.service,
+        date: formData.date,
+        time: formData.time,
+        status: 'pending',
+        message: formData.message,
+      };
+      setAppointments(prev => [newAppointment, ...prev]);
+      toast({ title: "Appointment created successfully" });
+    }
+    setIsDialogOpen(false);
+  };
+
+  const handleDelete = (id: string) => {
+    setAppointments(prev => prev.filter(apt => apt.id !== id));
+    toast({ title: "Appointment deleted" });
   };
 
   const getStatusBadge = (status: string) => {
@@ -74,13 +164,19 @@ const Appointments = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
-            Appointment Management
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            View and manage patient appointment requests
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
+              Appointment Management
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              View and manage patient appointment requests
+            </p>
+          </div>
+          <Button variant="hero" className="gap-2" onClick={() => handleOpenDialog()}>
+            <Plus className="w-4 h-4" />
+            Schedule Appointment
+          </Button>
         </div>
 
         {/* Stats */}
@@ -195,6 +291,14 @@ const Appointments = () => {
                       <Eye className="w-4 h-4 mr-1" />
                       View
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleOpenDialog(apt)}
+                    >
+                      <Edit2 className="w-4 h-4 mr-1" />
+                      Edit
+                    </Button>
                     {apt.status === 'pending' && (
                       <Button 
                         variant="default" 
@@ -214,6 +318,13 @@ const Appointments = () => {
                         Complete
                       </Button>
                     )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(apt.id)}
+                    >
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -226,6 +337,85 @@ const Appointments = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Create/Edit Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-display">
+                {editingAppointment ? 'Edit Appointment' : 'Schedule Appointment'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Patient Name *</label>
+                <Input
+                  value={formData.patientName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, patientName: e.target.value }))}
+                  placeholder="Enter patient name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Phone Number *</label>
+                <Input
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="+251 9XX XXX XXX"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Service *</label>
+                <Select
+                  value={formData.service}
+                  onValueChange={(v) => setFormData(prev => ({ ...prev, service: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select service" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {services.map(s => (
+                      <SelectItem key={s.id} value={s.title}>{s.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Date *</label>
+                  <Input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Time *</label>
+                  <Input
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Notes</label>
+                <textarea
+                  value={formData.message}
+                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                  placeholder="Additional notes or special requests..."
+                  className="w-full px-3 py-2 rounded-md border border-input bg-background text-foreground resize-none"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+              <Button variant="hero" onClick={handleSave}>
+                {editingAppointment ? 'Update' : 'Schedule'} Appointment
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* View Dialog */}
         <Dialog open={!!selectedAppointment} onOpenChange={() => setSelectedAppointment(null)}>

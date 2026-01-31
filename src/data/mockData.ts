@@ -1,14 +1,27 @@
 // Mock data for demo purposes
 
+export interface MedicalNote {
+  id: string;
+  date: string;
+  doctor: string;
+  diagnosis: string;
+  treatment: string;
+  notes: string;
+}
+
 export interface Patient {
   id: string;
   name: string;
   age: number;
   gender: 'Male' | 'Female';
   phone: string;
+  email?: string;
   visitDate: string;
   service: string;
   status: 'active' | 'completed';
+  bloodType?: string;
+  allergies?: string;
+  medicalHistory: MedicalNote[];
 }
 
 export interface Appointment {
@@ -23,14 +36,103 @@ export interface Appointment {
 }
 
 export const patients: Patient[] = [
-  { id: '1', name: 'Abebe Bekele', age: 35, gender: 'Male', phone: '+251911234567', visitDate: '2024-01-28', service: 'General Consultation', status: 'completed' },
-  { id: '2', name: 'Tigist Haile', age: 28, gender: 'Female', phone: '+251922345678', visitDate: '2024-01-28', service: 'Maternal Care', status: 'active' },
-  { id: '3', name: 'Dawit Tesfaye', age: 42, gender: 'Male', phone: '+251933456789', visitDate: '2024-01-27', service: 'Laboratory Services', status: 'completed' },
-  { id: '4', name: 'Sara Mengistu', age: 31, gender: 'Female', phone: '+251944567890', visitDate: '2024-01-27', service: 'Child Care', status: 'completed' },
-  { id: '5', name: 'Yohannes Girma', age: 55, gender: 'Male', phone: '+251955678901', visitDate: '2024-01-26', service: 'General Consultation', status: 'completed' },
-  { id: '6', name: 'Hana Solomon', age: 24, gender: 'Female', phone: '+251966789012', visitDate: '2024-01-26', service: 'Laboratory Services', status: 'completed' },
-  { id: '7', name: 'Meron Tadesse', age: 38, gender: 'Female', phone: '+251977890123', visitDate: '2024-01-25', service: 'Maternal Care', status: 'completed' },
-  { id: '8', name: 'Kiros Alemayehu', age: 47, gender: 'Male', phone: '+251988901234', visitDate: '2024-01-25', service: 'Emergency Care', status: 'completed' },
+  { 
+    id: '1', 
+    name: 'Abebe Bekele', 
+    age: 35, 
+    gender: 'Male', 
+    phone: '+251911234567',
+    email: 'abebe@email.com',
+    visitDate: '2024-01-28', 
+    service: 'General Consultation', 
+    status: 'completed',
+    bloodType: 'O+',
+    allergies: 'Penicillin',
+    medicalHistory: [
+      { id: '1', date: '2024-01-28', doctor: 'Dr. Solomon', diagnosis: 'Common Cold', treatment: 'Rest & fluids', notes: 'Patient recovered well' },
+      { id: '2', date: '2024-01-15', doctor: 'Dr. Abere', diagnosis: 'Hypertension', treatment: 'Medication prescribed', notes: 'Follow-up in 2 weeks' }
+    ]
+  },
+  { 
+    id: '2', 
+    name: 'Tigist Haile', 
+    age: 28, 
+    gender: 'Female', 
+    phone: '+251922345678',
+    email: 'tigist@email.com',
+    visitDate: '2024-01-28', 
+    service: 'Maternal Care', 
+    status: 'active',
+    bloodType: 'A+',
+    allergies: 'None',
+    medicalHistory: [
+      { id: '1', date: '2024-01-28', doctor: 'Dr. Kebede', diagnosis: 'Pregnancy Checkup', treatment: 'Prenatal vitamins', notes: 'Healthy pregnancy, 28 weeks' }
+    ]
+  },
+  { 
+    id: '3', 
+    name: 'Dawit Tesfaye', 
+    age: 42, 
+    gender: 'Male', 
+    phone: '+251933456789',
+    email: 'dawit@email.com',
+    visitDate: '2024-01-27', 
+    service: 'Laboratory Services', 
+    status: 'completed',
+    bloodType: 'B+',
+    allergies: 'Aspirin',
+    medicalHistory: [
+      { id: '1', date: '2024-01-27', doctor: 'Dr. Ahmed', diagnosis: 'Blood Work', treatment: 'Labs completed', notes: 'Results normal, no issues' }
+    ]
+  },
+  { 
+    id: '4', 
+    name: 'Sara Mengistu', 
+    age: 31, 
+    gender: 'Female', 
+    phone: '+251944567890',
+    email: 'sara@email.com',
+    visitDate: '2024-01-27', 
+    service: 'Child Care', 
+    status: 'completed',
+    bloodType: 'AB+',
+    allergies: 'Latex',
+    medicalHistory: [
+      { id: '1', date: '2024-01-27', doctor: 'Dr. Milkessa', diagnosis: 'Child Checkup', treatment: 'Vaccination', notes: 'Child healthy, all vaccines up to date' }
+    ]
+  },
+  { 
+    id: '5', 
+    name: 'Yohannes Girma', 
+    age: 55, 
+    gender: 'Male', 
+    phone: '+251955678901',
+    email: 'yohannes@email.com',
+    visitDate: '2024-01-26', 
+    service: 'General Consultation', 
+    status: 'completed',
+    bloodType: 'O+',
+    allergies: 'None',
+    medicalHistory: [
+      { id: '1', date: '2024-01-26', doctor: 'Dr. Solomon', diagnosis: 'Diabetes Monitoring', treatment: 'Insulin adjustments', notes: 'Regular monitoring required' }
+    ]
+  },
+  { 
+    id: '6', 
+    name: 'Hana Solomon', 
+    age: 24, 
+    gender: 'Female', 
+    phone: '+251966789012',
+    email: 'hana@email.com',
+    visitDate: '2024-01-26', 
+    service: 'Laboratory Services', 
+    status: 'completed',
+    bloodType: 'A+',
+    allergies: 'Sulfonamides',
+    medicalHistory: [
+      { id: '1', date: '2024-01-26', doctor: 'Dr. Abebe', diagnosis: 'Routine Checkup', treatment: 'Health screening', notes: 'All tests normal' }
+    ]
+  },
 ];
 
 export const appointments: Appointment[] = [
@@ -66,6 +168,27 @@ export const serviceDistribution = [
   { name: 'Maternal & Child Care', value: 20, color: 'hsl(15, 85%, 57%)' },
   { name: 'Emergency Care', value: 12, color: 'hsl(150, 60%, 45%)' },
   { name: 'Other Services', value: 8, color: 'hsl(270, 60%, 55%)' },
+];
+
+export interface StaffMember {
+  id: string;
+  name: string;
+  role: 'Doctor' | 'Nurse' | 'Lab Technician' | 'Administrator' | 'Receptionist';
+  specialty?: string;
+  email: string;
+  phone: string;
+  joinDate: string;
+  status: 'active' | 'inactive';
+  license?: string;
+}
+
+export const staffMembers: StaffMember[] = [
+  { id: '1', name: 'Dr. Solomon Abebe', role: 'Doctor', specialty: 'General Medicine', email: 'solomon.abebe@sheger.com', phone: '+251911111111', joinDate: '2020-03-15', status: 'active', license: 'LIC-2020-001' },
+  { id: '2', name: 'Dr. Kebede Tekle', role: 'Doctor', specialty: 'Obstetrics', email: 'kebede.tekle@sheger.com', phone: '+251922222222', joinDate: '2019-06-20', status: 'active', license: 'LIC-2019-002' },
+  { id: '3', name: 'Nurse Tigist Worku', role: 'Nurse', email: 'tigist.worku@sheger.com', phone: '+251933333333', joinDate: '2021-01-10', status: 'active' },
+  { id: '4', name: 'Lab Tech Abere Assefa', role: 'Lab Technician', email: 'abere.assefa@sheger.com', phone: '+251944444444', joinDate: '2021-09-05', status: 'active', license: 'LAB-2021-001' },
+  { id: '5', name: 'Admin Hiwot Teshome', role: 'Administrator', email: 'hiwot.teshome@sheger.com', phone: '+251955555555', joinDate: '2020-11-15', status: 'active' },
+  { id: '6', name: 'Receptionist Meseret Fikre', role: 'Receptionist', email: 'meseret.fikre@sheger.com', phone: '+251966666666', joinDate: '2022-02-01', status: 'active' },
 ];
 
 export const services = [
