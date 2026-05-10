@@ -1,7 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-// Initialize Gemini API
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const { OpenAI } = require('openai');
 
 const SYSTEM_PROMPT = `
 You are the Sheger Health Connect AI Assistant, a helpful and empathetic virtual health advisor for a clinic based in Addis Ababa, Ethiopia.
@@ -20,7 +17,7 @@ CRITICAL RULES:
 3. In case of severe symptoms (chest pain, severe bleeding, difficulty breathing), immediately advise them to visit Emergency Care or call an ambulance.
 `;
 
-// @desc    Chat with Gemini Health Assistant
+// @desc    Chat with OpenAI Health Assistant
 // @route   POST /api/ai/chat
 // @access  Private (Patients & Users)
 const chatWithAssistant = async (req, res) => {
@@ -31,33 +28,44 @@ const chatWithAssistant = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Message is required' });
     }
 
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
       return res.status(500).json({ 
         success: false, 
-        message: 'Gemini API key is not configured. Please contact the administrator.' 
+        message: 'OpenAI API key is not configured. Please contact the administrator.' 
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-    // Format history for Gemini API
-    const formattedHistory = history ? history.map(msg => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }]
-    })) : [];
-
-    // Prepend system prompt to the first user message if there is no history
-    let finalMessage = message;
-    if (formattedHistory.length === 0) {
-      finalMessage = `System Context: ${SYSTEM_PROMPT}\n\nUser Message: ${message}`;
-    }
-
-    const chat = model.startChat({
-      history: formattedHistory,
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const result = await chat.sendMessage(finalMessage);
-    const responseText = result.response.text();
+    // Format history for OpenAI API
+    // Ensure history follows { role: 'user'|'assistant', content: string }
+    const messages = [
+      { role: 'system', content: SYSTEM_PROMPT }
+    ];
+
+    if (history && Array.isArray(history)) {
+      history.forEach(msg => {
+        if (msg.role && msg.content) {
+          // Map 'model' to 'assistant' if it was coming from an old Gemini history
+          const mappedRole = msg.role === 'model' ? 'assistant' : msg.role;
+          messages.push({ role: mappedRole, content: msg.content });
+        }
+      });
+    }
+
+    // Add current user message
+    messages.push({ role: 'user', content: message });
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini', // or gpt-4, gpt-3.5-turbo
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 500,
+    });
+
+    const responseText = completion.choices[0].message.content;
 
     res.json({
       success: true,
