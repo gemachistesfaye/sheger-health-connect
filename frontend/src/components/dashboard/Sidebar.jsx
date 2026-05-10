@@ -56,13 +56,15 @@ const Sidebar = ({ isOpen, onClose }) => {
         return [
           { icon: LayoutDashboard, label: t('dashboard.menu.overview'), to: '/doctor/dashboard' },
           { icon: Calendar, label: t('dashboard.menu.appointments'), to: '/doctor/appointments' },
+          { icon: MessageSquare, label: 'Messages', to: '/doctor/messages' },
           { icon: Users, label: t('dashboard.menu.doctors'), to: '/doctor/profile' },
           { icon: Settings, label: t('dashboard.menu.settings'), to: '/doctor/settings' },
         ];
       case 'Admin':
         return [
           { icon: LayoutDashboard, label: t('dashboard.menu.overview'), to: '/admin/dashboard' },
-          { icon: Users, label: t('dashboard.menu.doctors'), to: '/admin/users' },
+          { icon: Users, label: 'Manage Doctors', to: '/admin/users' },
+          { icon: MessageSquare, label: 'System Messages', to: '/admin/messages' },
           { icon: Activity, label: t('dashboard.menu.billing'), to: '/admin/system' },
           { icon: Settings, label: t('dashboard.menu.settings'), to: '/admin/settings' },
         ];
@@ -72,7 +74,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           { icon: Calendar, label: t('dashboard.menu.appointments'), to: '/patient/appointments' },
           { icon: FileText, label: t('dashboard.menu.records'), to: '/patient/records' },
           { icon: Users, label: t('dashboard.menu.doctors'), to: '/patient/doctors' },
-          { icon: MessageSquare, label: t('dashboard.menu.aiAssistant'), to: '/patient/ai' },
+          { icon: MessageSquare, label: 'Messages', to: '/patient/messages' },
           { icon: Bell, label: t('dashboard.menu.notifications'), to: '/patient/notifications' },
           { icon: CreditCard, label: t('dashboard.menu.billing'), to: '/patient/billing' },
           { icon: Settings, label: t('dashboard.menu.settings'), to: '/patient/settings' },

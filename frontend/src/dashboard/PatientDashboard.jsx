@@ -199,6 +199,31 @@ const PatientDashboard = () => {
 
         {/* Right Sidebar (1/3) */}
         <div className="space-y-8">
+          {/* Digital Patient ID */}
+          <motion.div variants={itemVariants} className="bg-gray-900 p-8 rounded-[32px] text-white shadow-xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-500">
+               <Activity size={120} />
+            </div>
+            <div className="relative z-10 text-center">
+               <h3 className="text-lg font-black mb-6 uppercase tracking-tighter text-emerald-400">Digital Patient ID</h3>
+               <div className="bg-white p-4 rounded-[24px] inline-block mb-6 shadow-2xl">
+                  {/* Mock QR Code */}
+                  <div className="w-32 h-32 bg-gray-50 flex items-center justify-center border-4 border-gray-900 rounded-xl">
+                     <div className="grid grid-cols-3 gap-1">
+                        {[...Array(9)].map((_, i) => (
+                          <div key={i} className={`w-6 h-6 rounded-sm ${i % 2 === 0 ? 'bg-gray-900' : 'bg-gray-200'}`} />
+                        ))}
+                     </div>
+                  </div>
+               </div>
+               <p className="font-black text-xl mb-1">{user?.full_name}</p>
+               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6">SHC-ID: 9021-4432-88</p>
+               <button className="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-xs font-bold transition-all">
+                  Quick Check-in
+               </button>
+            </div>
+          </motion.div>
+
           {/* Assigned Doctor Card */}
           <motion.div variants={itemVariants} className="bg-primary p-8 rounded-[32px] text-white shadow-xl shadow-primary/30 relative overflow-hidden">
             <div className="absolute -right-4 -bottom-4 opacity-20 rotate-12">

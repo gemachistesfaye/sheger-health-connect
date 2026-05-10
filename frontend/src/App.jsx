@@ -26,6 +26,7 @@ import AIAssistantPage from "./pages/AIAssistantPage.jsx";
 import NotificationsPage from "./pages/NotificationsPage.jsx";
 import BillingPage from "./pages/BillingPage.jsx";
 import SettingsPage from "./pages/SettingsPage.jsx";
+import MessagesPage from "./pages/MessagesPage.jsx";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/patient/doctors" element={<DoctorsPage />} />
             <Route path="/patient/ai" element={<AIAssistantPage />} />
             <Route path="/patient/notifications" element={<NotificationsPage />} />
+            <Route path="/patient/messages" element={<MessagesPage />} />
             <Route path="/patient/billing" element={<BillingPage />} />
             <Route path="/patient/settings" element={<SettingsPage />} />
           </Route>
