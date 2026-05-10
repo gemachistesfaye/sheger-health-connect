@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Search, 
@@ -24,15 +24,32 @@ const categories = [
   { name: 'Neurology', icon: Brain },
 ];
 
-const doctors = [];
-
 const DoctorsPage = () => {
+  const [doctors, setDoctors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeCat, setActiveCat] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
 
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/doctors');
+        const data = await res.json();
+        if (data.success) {
+          setDoctors(data.data);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
   const filteredDocs = doctors.filter(doc => 
-    (activeCat === 'All' || doc.spec.includes(activeCat)) &&
-    doc.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (activeCat === 'All' || doc.specialization?.includes(activeCat)) &&
+    doc.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -81,7 +98,12 @@ const DoctorsPage = () => {
 
       {/* Doctors Grid */}
       <div className="grid grid-cols-1 gap-8">
-        {filteredDocs.length > 0 ? (
+        {isLoading ? (
+          <div className="py-20 text-center">
+            <div className="animate-spin w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-400 font-bold tracking-tight">Accessing medical directory...</p>
+          </div>
+        ) : filteredDocs.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredDocs.map((doc) => (
               <motion.div
@@ -90,7 +112,38 @@ const DoctorsPage = () => {
                 whileHover={{ y: -10 }}
                 className="bg-white rounded-[40px] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-600/5 transition-all overflow-hidden group"
               >
-                {/* ... existing card code ... */}
+                 <div className="p-8">
+                    <div className="flex items-center justify-between mb-6">
+                       <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-2xl border-4 border-white shadow-sm">
+                          {doc.full_name.charAt(0)}
+                       </div>
+                       <div className="flex flex-col items-end">
+                          <div className="flex items-center gap-1 text-orange-400">
+                             <Star size={14} fill="currentColor" />
+                             <span className="text-xs font-black">4.9</span>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-300 uppercase">Verified</span>
+                       </div>
+                    </div>
+
+                    <h3 className="text-xl font-black text-gray-900 mb-1 group-hover:text-emerald-600 transition-colors">{doc.full_name}</h3>
+                    <p className="text-sm font-bold text-emerald-600 mb-4">{doc.specialization || 'General Practitioner'}</p>
+                    
+                    <div className="space-y-3 mb-8">
+                       <div className="flex items-center gap-3 text-gray-400">
+                          <MapPin size={14} />
+                          <span className="text-xs font-medium">Addis Ababa, Ethiopia</span>
+                       </div>
+                       <div className="flex items-center gap-3 text-gray-400">
+                          <Calendar size={14} />
+                          <span className="text-xs font-medium">Available Today</span>
+                       </div>
+                    </div>
+
+                    <button className="w-full py-4 bg-gray-50 text-gray-900 rounded-2xl font-black text-sm group-hover:bg-emerald-600 group-hover:text-white group-hover:shadow-xl group-hover:shadow-emerald-600/20 transition-all flex items-center justify-center gap-2">
+                       Book Consultation <ChevronRight size={16} />
+                    </button>
+                 </div>
               </motion.div>
             ))}
           </div>

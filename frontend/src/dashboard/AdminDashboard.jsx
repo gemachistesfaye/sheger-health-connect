@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, 
@@ -39,6 +39,22 @@ const data = [
 
 const AdminDashboard = () => {
   const { user, token } = useAuth();
+  const [stats, setStats] = useState({ doctors: 0, patients: 0, revenue: '0 ETB', appointments: 0 });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/admin/stats', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) setStats(data.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    if (token) fetchStats();
+  }, [token]);
   
   return (
     <div className="space-y-8">
@@ -56,10 +72,10 @@ const AdminDashboard = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Patients" value="1,248" icon={Users} color="bg-primary" trend={12} />
-        <StatCard title="Active Doctors" value="24" icon={Activity} color="bg-blue-500" />
-        <StatCard title="Weekly Revenue" value="45,200 ETB" icon={DollarSign} color="bg-emerald-500" trend={8} />
-        <StatCard title="Total Appointments" value="856" icon={Calendar} color="bg-purple-500" />
+        <StatCard title="Total Patients" value={stats.patients} icon={Users} color="bg-primary" trend={12} />
+        <StatCard title="Active Doctors" value={stats.doctors} icon={Activity} color="bg-blue-500" />
+        <StatCard title="Weekly Revenue" value={stats.revenue} icon={DollarSign} color="bg-emerald-500" trend={8} />
+        <StatCard title="Total Appointments" value={stats.appointments} icon={Calendar} color="bg-purple-500" />
       </div>
 
       {/* Charts Section */}

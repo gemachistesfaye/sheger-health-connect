@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getDoctors, onboardDoctor } = require('../controllers/adminController');
+const { getDoctors, onboardDoctor, getStats } = require('../controllers/adminController');
 const { sendMessage, getMyMessages } = require('../controllers/messageController');
 const { addPayment, getPayments } = require('../controllers/paymentController');
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -9,6 +9,7 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 router.use(protect);
 router.use(authorize('Admin'));
 
+router.get('/stats', getStats);
 router.get('/doctors', getDoctors);
 router.post('/doctors', onboardDoctor);
 
