@@ -1,5 +1,5 @@
 import React from 'react';
-import { Github, Send, Phone } from 'lucide-react';
+import { Github, Send, Phone, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -28,6 +28,12 @@ const Footer = () => {
                   className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-gray-900 hover:text-white transition-all shadow-sm"
                 >
                   <Github size={16} />
+                </a>
+                <a 
+                  href="mailto:gemachistesfaye36@gmail.com" 
+                  className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                >
+                  <Mail size={16} />
                 </a>
                 <a 
                   href="https://t.me/urjiiko1" 
