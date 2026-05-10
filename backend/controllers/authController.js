@@ -13,17 +13,17 @@ const generateToken = (id, role) => {
 // @access  Public
 const register = async (req, res) => {
   try {
-    const { full_name, email, phone, password, role } = req.body;
+    const { full_name, username, email, phone, password, role, specialization } = req.body;
 
     // Validate request
-    if (!full_name || !email || !phone || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide all required fields' });
+    if (!full_name || !username || !password) {
+      return res.status(400).json({ success: false, message: 'Please provide required fields (full_name, username, password)' });
     }
 
     // Check if user exists
-    const userExists = await User.findOne({ where: { email } });
+    const userExists = await User.findOne({ where: { username } });
     if (userExists) {
-      return res.status(400).json({ success: false, message: 'User with this email already exists' });
+      return res.status(400).json({ success: false, message: 'Username is already taken' });
     }
 
     // Hash password
@@ -33,10 +33,12 @@ const register = async (req, res) => {
     // Create user
     const user = await User.create({
       full_name,
+      username,
       email,
       phone,
       password_hash,
-      role: role || 'Patient' // default to Patient if not provided
+      role: role || 'Patient',
+      specialization
     });
 
     if (user) {
@@ -64,25 +66,25 @@ const register = async (req, res) => {
 // @access  Public
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     // Validate request
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide email and password' });
+    if (!username || !password) {
+      return res.status(400).json({ success: false, message: 'Please provide username and password' });
     }
 
     // Check for user
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { username } });
     
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      return res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      return res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
 
     res.json({

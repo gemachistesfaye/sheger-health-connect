@@ -38,7 +38,7 @@ const data = [
 ];
 
 const AdminDashboard = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   
   return (
     <div className="space-y-8">
@@ -165,24 +165,49 @@ const AdminDashboard = () => {
             <Users size={120} />
           </div>
           <h4 className="text-xl font-black mb-6">Create Doctor Account</h4>
-          <form className="space-y-4" onSubmit={(e) => {
+          <form className="space-y-4" onSubmit={async (e) => {
             e.preventDefault();
-            alert('Doctor account created and credentials sent to email.');
+            const formData = new FormData(e.target);
+            const payload = Object.fromEntries(formData);
+            
+            try {
+              const res = await fetch('http://localhost:5000/api/admin/doctors', {
+                method: 'POST',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+              });
+              const data = await res.json();
+              if (data.success) {
+                alert('Doctor onboarded successfully!');
+                e.target.reset();
+              } else {
+                alert(data.message);
+              }
+            } catch (err) {
+              alert('Failed to connect to server.');
+            }
           }}>
              <div className="space-y-1">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Doctor Name</label>
-                <input type="text" placeholder="Dr. Full Name" className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm" />
+                <input name="full_name" type="text" placeholder="Dr. Full Name" className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm" required />
              </div>
              <div className="space-y-1">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Official Email</label>
-                <input type="email" placeholder="doctor@sheger.care" className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm" />
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Username</label>
+                <input name="username" type="text" placeholder="doctor_username" className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm" required />
              </div>
              <div className="space-y-1">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Department</label>
-                <select className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm">
-                   <option className="bg-gray-900">General Consultation</option>
-                   <option className="bg-gray-900">Cardiology</option>
-                   <option className="bg-gray-900">Pediatrics</option>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Password</label>
+                <input name="password" type="password" placeholder="••••••••" className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm" required />
+             </div>
+             <div className="space-y-1">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Specialization</label>
+                <select name="specialization" className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm">
+                   <option className="bg-gray-900" value="General">General Consultation</option>
+                   <option className="bg-gray-900" value="Cardiology">Cardiology</option>
+                   <option className="bg-gray-900" value="Pediatrics">Pediatrics</option>
                 </select>
              </div>
              <button className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-emerald-600/20 mt-4">

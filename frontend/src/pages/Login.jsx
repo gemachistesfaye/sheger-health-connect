@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const Login = () => {
   const { t } = useTranslation();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +22,7 @@ const Login = () => {
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ username, password })
       });
 
       const data = await response.json();
@@ -62,14 +62,14 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-1">{t('auth.email')}</label>
+            <label className="block text-sm font-medium mb-1">Username</label>
             <input
-              type="email"
+              type="text"
               required
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div>
@@ -94,10 +94,7 @@ const Login = () => {
         </form>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
-          {t('auth.noAccount')}{' '}
-          <Link to="/register" className="text-primary font-medium hover:underline">
-            {t('auth.registerHere')}
-          </Link>
+          Contact system administrator if you cannot log in.
         </div>
       </div>
     </div>
