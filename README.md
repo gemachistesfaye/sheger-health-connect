@@ -1,6 +1,16 @@
 # 🏥 Sheger Health Connect
 
-A professional, full-stack healthcare management system designed for medical specialists and patients in Addis Ababa, Ethiopia. Built with a focus on role-based security, AI-assisted triage, and premium user experience.
+> [!IMPORTANT]
+> **Status**: Development in Progress. This platform is currently being refined for production. Some features (Payment Gateway, Real-time Alerts) are undergoing final integration.
+
+## 🛡️ Security Architecture
+Sheger Health prioritizes patient data safety with a multi-layered security approach:
+- **No Public Registration**: Prevents unauthorized access. All user accounts (Doctors/Patients) are created and vetted by the System Administrator.
+- **Advanced Encryption**: All passwords undergo **bcrypt** salted hashing before storage. Plaintext passwords are never stored or logged.
+- **JWT Authentication**: Secure, stateless session management using JSON Web Tokens (24h expiration).
+- **Role-Based Access Control (RBAC)**: Strict separation of privileges. Doctors cannot access admin panels, and patients can only access their personal medical records.
+- **SQL Injection Protection**: All database queries are handled via **Sequelize ORM**, using prepared statements and parameterized queries.
+- **CORS Protection**: Access-Control headers are restricted to authorized frontend origins only.
 
 ## 🚀 Key Features
 
@@ -54,4 +64,10 @@ node seed-admin.js
 The application uses a modular MVC-style architecture on the backend with a clear separation of concerns between models, controllers, and routes. The frontend follows a component-based design with centralized state management via `AuthContext`.
 
 ---
+### 🚧 Current Development Note
+This system is **NOT YET FINISHED**. Active development is focused on:
+- SMS Gateway Integration for patient alerts.
+- Advanced AI Triage multi-language support.
+- Production deployment scripts and environment hardening.
+
 © 2026 Sheger Health. Developed by Gemachis Tesfaye.
