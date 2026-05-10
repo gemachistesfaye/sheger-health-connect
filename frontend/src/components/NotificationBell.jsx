@@ -1,7 +1,7 @@
+import React, { useState } from 'react';
 import { useNotification } from '../context/NotificationContext';
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BellIcon } from 'lucide-react';
+import { Bell, X, Info, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const NotificationBell = () => {
   const { notifications, clear } = useNotification();
@@ -13,41 +13,75 @@ const NotificationBell = () => {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="p-2 rounded-full hover:bg-white/20 transition-colors"
+        className="p-2.5 bg-gray-50 border border-gray-100 text-gray-500 hover:bg-gray-100 rounded-2xl transition-all relative group"
         title="Notifications"
       >
-        <BellIcon className="w-5 h-5 text-white" />
+        <Bell size={20} className="group-hover:rotate-12 transition-transform" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-600 text-xs text-white rounded-full w-4 h-4 flex items-center justify-center">
-            {unreadCount}
-          </span>
+          <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-bounce" />
         )}
       </button>
 
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border p-4 z-20"
-          >
-            <div className="flex justify-between items-center mb-2">
-              <h4 className="font-bold text-gray-700">Notifications</h4>
-              <button onClick={clear} className="text-xs text-primary hover:underline">Clear</button>
-            </div>
-            {notifications.length === 0 ? (
-              <p className="text-sm text-gray-500">No new notifications.</p>
-            ) : (
-              <ul className="space-y-2 max-h-60 overflow-y-auto">
-                {notifications.map((n, i) => (
-                  <li key={i} className="text-sm text-gray-800 border-b pb-1">
-                    {n.message}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </motion.div>
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-gray-100 rounded-[32px] shadow-2xl z-50 overflow-hidden"
+            >
+              <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                <div>
+                  <h4 className="font-bold text-gray-900">Notifications</h4>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">You have {unreadCount} unread</p>
+                </div>
+                <button 
+                  onClick={clear}
+                  className="text-xs font-bold text-primary hover:bg-primary/10 px-3 py-1.5 rounded-xl transition-colors"
+                >
+                  Clear All
+                </button>
+              </div>
+
+              <div className="max-h-[400px] overflow-y-auto no-scrollbar p-2">
+                {notifications.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Bell className="text-gray-200" size={32} />
+                    </div>
+                    <p className="text-sm font-bold text-gray-400">All caught up!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    {notifications.map((n, i) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        className="p-4 rounded-2xl hover:bg-gray-50 transition-colors flex gap-4 border border-transparent hover:border-gray-100"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
+                          <Info size={18} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-700 leading-relaxed font-medium">{n.message}</p>
+                          <span className="text-[10px] text-gray-400 font-bold">Just now</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 bg-gray-50/50 border-t border-gray-50 text-center">
+                <button className="text-xs font-bold text-gray-500 hover:text-primary transition-colors">
+                  View All Notifications
+                </button>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

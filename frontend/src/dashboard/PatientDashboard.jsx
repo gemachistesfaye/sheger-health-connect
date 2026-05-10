@@ -1,144 +1,251 @@
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import { 
+  Calendar, 
+  FileText, 
+  Activity, 
+  Bell, 
+  ArrowUpRight, 
+  Clock, 
+  User, 
+  Stethoscope,
+  ChevronRight,
+  Plus
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import LanguageSwitcher from '../components/LanguageSwitcher';
-import AIChat from '../components/AIChat';
-import AppointmentBooking from '../components/AppointmentBooking';
-import { useState, useEffect } from 'react';
+import StatCard from '../components/dashboard/StatCard';
+import HealthSmartCards from '../components/dashboard/HealthSmartCards';
 
 const PatientDashboard = () => {
   const { t } = useTranslation();
-  const { user, logout, token } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const { user, token } = useAuth();
   const [appointmentCount, setAppointmentCount] = useState(0);
   const [medicalRecords, setMedicalRecords] = useState([]);
-
-  const fetchData = async () => {
-    try {
-      const appRes = await fetch('http://localhost:5000/api/appointments', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const appData = await appRes.json();
-      if (appData.success) setAppointmentCount(appData.data.length);
-
-      if (user) {
-        const recRes = await fetch(`http://localhost:5000/api/records/${user.id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const recData = await recRes.json();
-        if (recData.success) setMedicalRecords(recData.data);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const appRes = await fetch('http://localhost:5000/api/appointments', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const appData = await appRes.json();
+        if (appData.success) setAppointmentCount(appData.data.length);
+
+        if (user) {
+          const recRes = await fetch(`http://localhost:5000/api/records/${user.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const recData = await recRes.json();
+          if (recData.success) setMedicalRecords(recData.data);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     fetchData();
   }, [token, user]);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Top Navbar */}
-      <nav className="bg-primary text-white px-6 py-4 shadow-md flex justify-between items-center">
-        <h1 className="text-xl font-bold">🏥 Sheger Health</h1>
-        <div className="flex items-center gap-4">
-          <LanguageSwitcher />
-          <span className="font-medium text-sm hidden md:inline opacity-90">
-            {t('dashboard.welcome')}, {user?.full_name}
-          </span>
-          <button
-            onClick={logout}
-            className="bg-white/20 px-3 py-1.5 rounded-md text-sm hover:bg-white/30 transition"
-          >
-            {t('nav.logout')}
-          </button>
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-8"
+    >
+      {/* Welcome Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {t('dashboard.welcome')}, {user?.full_name?.split(' ')[0]} 👋
+          </h1>
+          <p className="text-gray-500 mt-1">{t('dashboard.subtitle') || "Your health overview is ready for today."}</p>
         </div>
-      </nav>
+        <button className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform active:scale-95">
+          <Plus size={20} />
+          {t('dashboard.bookAppointment')}
+        </button>
+      </div>
 
-      <div className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col lg:flex-row gap-8">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard 
+          title={t('dashboard.myAppointments')} 
+          value={appointmentCount} 
+          icon={Calendar} 
+          color="bg-emerald-500" 
+          trend={12} 
+        />
+        <StatCard 
+          title={t('dashboard.medicalRecords')} 
+          value={medicalRecords.length} 
+          icon={FileText} 
+          color="bg-blue-500" 
+          trend={8} 
+        />
+        <StatCard 
+          title={t('dashboard.prescriptions')} 
+          value="4" 
+          icon={Activity} 
+          color="bg-purple-500" 
+          subtext="Active"
+        />
+        <StatCard 
+          title={t('dashboard.healthScore')} 
+          value="85%" 
+          icon={Bell} 
+          color="bg-orange-500" 
+          subtext="Good"
+        />
+      </div>
 
-        {/* Main Content */}
-        <div className="flex-1 space-y-6">
-          {/* Stat Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-l-4 border-l-primary">
-              <h3 className="font-bold text-gray-500 text-sm mb-1">{t('dashboard.myAppointments')}</h3>
-              <p className="text-3xl font-bold text-gray-800">{appointmentCount}</p>
+      {/* Smart Health Cards */}
+      <HealthSmartCards />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content Area (Left 2/3) */}
+        <div className="lg:col-span-2 space-y-8">
+          
+          {/* Health Summary Card */}
+          <motion.div variants={itemVariants} className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-500">
+              <Stethoscope size={120} className="text-primary" />
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-l-4 border-l-blue-500">
-              <h3 className="font-bold text-gray-500 text-sm mb-1">{t('dashboard.medicalRecords')}</h3>
-              <p className="text-3xl font-bold text-gray-800">{medicalRecords.length}</p>
-            </div>
-          </div>
-
-          {/* Tab Navigation */}
-          <div className="flex border-b border-gray-200">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`pb-3 px-4 font-medium text-sm transition-colors ${activeTab === 'overview' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              {t('dashboard.bookAppointment')}
-            </button>
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`pb-3 px-4 font-medium text-sm transition-colors ${activeTab === 'history' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              {t('dashboard.myHistory')}
-            </button>
-          </div>
-
-          {/* Tab Content */}
-          <div className="bg-white rounded-xl shadow-sm min-h-[400px]">
-            {activeTab === 'overview' && <AppointmentBooking onBookingSuccess={fetchData} />}
-            {activeTab === 'history' && (
-              <div className="p-6">
-                {medicalRecords.length === 0 ? (
-                  <div className="text-center text-gray-400 py-16">
-                    <div className="text-5xl mb-4">📋</div>
-                    <p>{t('dashboard.noRecords')}</p>
+            <div className="relative z-10">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <Activity className="text-primary" />
+                Recent Health Summary
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                {[
+                  { label: 'Weight', value: '72kg', unit: '0.5kg loss' },
+                  { label: 'Height', value: '178cm', unit: '-' },
+                  { label: 'Blood Type', value: 'O+', unit: 'Normal' },
+                  { label: 'BP', value: '120/80', unit: 'Optimal' }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex flex-col">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{item.label}</span>
+                    <span className="text-xl font-bold text-gray-900">{item.value}</span>
+                    <span className="text-[10px] text-emerald-500 font-bold">{item.unit}</span>
                   </div>
-                ) : (
-                  <div className="space-y-6">
-                    {medicalRecords.map((record) => (
-                      <div key={record.id} className="border rounded-lg p-5 bg-slate-50">
-                        <div className="flex justify-between items-start mb-4 border-b pb-2">
-                          <h4 className="font-bold text-primary">Visit #{record.id}</h4>
-                          <span className="text-sm text-muted-foreground">{new Date(record.visit_date).toLocaleDateString()}</span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <strong className="block text-gray-700 mb-1">Diagnosis:</strong>
-                            <p className="text-gray-600 bg-white p-2 border rounded">{record.diagnosis}</p>
-                          </div>
-                          <div>
-                            <strong className="block text-gray-700 mb-1">Prescriptions:</strong>
-                            <p className="text-gray-600 bg-white p-2 border rounded">{record.prescriptions || 'None'}</p>
-                          </div>
-                          <div>
-                            <strong className="block text-gray-700 mb-1">Lab Results:</strong>
-                            <p className="text-gray-600 bg-white p-2 border rounded">{record.lab_results || 'None'}</p>
-                          </div>
-                          <div>
-                            <strong className="block text-gray-700 mb-1">Allergies:</strong>
-                            <p className="text-gray-600 bg-white p-2 border rounded">{record.allergies || 'None recorded'}</p>
-                          </div>
-                        </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Recent Records Timeline */}
+          <motion.div variants={itemVariants} className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-bold text-gray-900">{t('dashboard.recentRecords')}</h2>
+              <button className="text-sm font-bold text-primary hover:underline flex items-center gap-1">
+                View All <ChevronRight size={16} />
+              </button>
+            </div>
+            
+            {isLoading ? (
+              <div className="space-y-4">
+                {[1, 2].map(i => (
+                  <div key={i} className="h-24 bg-gray-50 animate-pulse rounded-2xl" />
+                ))}
+              </div>
+            ) : medicalRecords.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-2xl">
+                <FileText className="mx-auto text-gray-300 mb-2" size={40} />
+                <p className="text-gray-500 font-medium">No medical records found yet.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {medicalRecords.slice(0, 3).map((record, idx) => (
+                  <div key={record.id} className="flex gap-4 group">
+                    <div className="flex flex-col items-center">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border-2 border-white group-hover:scale-110 transition-transform">
+                        <Clock size={18} />
                       </div>
-                    ))}
+                      {idx !== medicalRecords.slice(0, 3).length - 1 && (
+                        <div className="w-0.5 h-full bg-gray-100 my-1" />
+                      )}
+                    </div>
+                    <div className="flex-1 pb-6 border-b border-gray-50 last:border-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <h4 className="font-bold text-gray-900">Diagnosis: {record.diagnosis}</h4>
+                        <span className="text-xs text-gray-400 font-bold">
+                          {new Date(record.visit_date).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 line-clamp-1">{record.prescriptions || 'No medication prescribed'}</p>
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
 
-        {/* Right Sidebar - AI Assistant */}
-        <div className="w-full lg:w-[380px] xl:w-[420px]">
-          <AIChat />
-        </div>
+        {/* Right Sidebar (1/3) */}
+        <div className="space-y-8">
+          {/* Assigned Doctor Card */}
+          <motion.div variants={itemVariants} className="bg-primary p-8 rounded-[32px] text-white shadow-xl shadow-primary/30 relative overflow-hidden">
+            <div className="absolute -right-4 -bottom-4 opacity-20 rotate-12">
+              <Stethoscope size={150} />
+            </div>
+            <h3 className="text-lg font-bold mb-6">Assigned Doctor</h3>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl border border-white/30">
+                👨‍⚕️
+              </div>
+              <div>
+                <p className="font-bold text-xl">Dr. Samuel Kassa</p>
+                <p className="text-white/70 text-sm">General Physician</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button className="flex-1 bg-white text-primary py-2.5 rounded-xl text-sm font-bold hover:bg-white/90 transition-colors">
+                Chat
+              </button>
+              <button className="p-2.5 bg-white/20 rounded-xl hover:bg-white/30 transition-colors">
+                <ArrowUpRight size={20} />
+              </button>
+            </div>
+          </motion.div>
 
+          {/* Health Tips Section */}
+          <motion.div variants={itemVariants} className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+            <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <Activity className="text-emerald-500" />
+              Health Tips
+            </h3>
+            <div className="space-y-4">
+              {[
+                { title: 'Hydration', text: 'Drink at least 8 glasses of water today.' },
+                { title: 'Movement', text: 'Take a 10-minute walk after lunch.' },
+                { title: 'Sleep', text: 'Try to get 8 hours of rest tonight.' }
+              ].map((tip, idx) => (
+                <div key={idx} className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-50">
+                  <h4 className="text-sm font-bold text-emerald-700 mb-1">{tip.title}</h4>
+                  <p className="text-xs text-emerald-600/80 leading-relaxed">{tip.text}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

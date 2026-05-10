@@ -1,5 +1,17 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Users, 
+  Activity, 
+  DollarSign, 
+  Calendar, 
+  ArrowUpRight, 
+  Settings, 
+  ShieldCheck,
+  BarChart3
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import StatCard from '../components/dashboard/StatCard';
 import {
   BarChart,
   Bar,
@@ -9,115 +21,128 @@ import {
   Tooltip,
   ResponsiveContainer,
   LineChart,
-  Line
+  Line,
+  AreaChart,
+  Area
 } from 'recharts';
 
 const data = [
   { name: 'Mon', patients: 40, revenue: 2400 },
   { name: 'Tue', patients: 30, revenue: 1398 },
-  { name: 'Wed', patients: 20, revenue: 9800 },
+  { name: 'Wed', patients: 65, revenue: 9800 },
   { name: 'Thu', patients: 27, revenue: 3908 },
-  { name: 'Fri', patients: 18, revenue: 4800 },
+  { name: 'Fri', patients: 48, revenue: 4800 },
   { name: 'Sat', patients: 23, revenue: 3800 },
   { name: 'Sun', patients: 34, revenue: 4300 },
 ];
 
 const AdminDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   
   return (
-    <div className="min-h-screen bg-secondary/30 flex">
-      {/* Sidebar Navigation */}
-      <aside className="w-64 bg-slate-900 text-white flex flex-col">
-        <div className="p-6 font-bold text-xl tracking-wider text-primary border-b border-slate-800">
-          Sheger Admin
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Admin Command Center</h1>
+          <p className="text-gray-500 mt-1">System-wide health metrics and management.</p>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
-          <button className="w-full text-left px-4 py-3 bg-primary rounded-lg font-medium text-white shadow-sm">
-            Overview
-          </button>
-          <button className="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
-            Users Management
-          </button>
-          <button className="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
-            All Appointments
-          </button>
-          <button className="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
-            System Settings
-          </button>
-        </nav>
-        <div className="p-4 border-t border-slate-800">
-          <button onClick={logout} className="w-full text-left px-4 py-2 text-slate-400 hover:text-white transition">
-            Logout
-          </button>
-        </div>
-      </aside>
+        <button className="flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-2xl font-bold shadow-xl shadow-gray-900/10">
+          <ShieldCheck size={20} />
+          System Health
+        </button>
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-800">Command Center</h1>
-            <p className="text-muted-foreground">Welcome, Administrator {user?.full_name}</p>
-          </div>
-        </div>
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard title="Total Patients" value="1,248" icon={Users} color="bg-primary" trend={12} />
+        <StatCard title="Active Doctors" value="24" icon={Activity} color="bg-blue-500" />
+        <StatCard title="Weekly Revenue" value="45,200 ETB" icon={DollarSign} color="bg-emerald-500" trend={8} />
+        <StatCard title="Total Appointments" value="856" icon={Calendar} color="bg-purple-500" />
+      </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-l-4 border-l-primary">
-            <h3 className="text-sm font-bold text-gray-400 mb-1">Total Patients</h3>
-            <p className="text-2xl font-bold text-slate-800">1,248</p>
-            <p className="text-xs text-green-500 mt-2">↑ 12% from last month</p>
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm"
+        >
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-lg font-bold text-gray-900">Patient Analytics</h3>
+            <select className="bg-gray-50 border-none rounded-xl px-4 py-2 text-xs font-bold text-gray-500 focus:outline-none">
+              <option>Last 7 Days</option>
+              <option>Last 30 Days</option>
+            </select>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-l-4 border-l-blue-500">
-            <h3 className="text-sm font-bold text-gray-400 mb-1">Active Doctors</h3>
-            <p className="text-2xl font-bold text-slate-800">24</p>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={data}>
+                <defs>
+                  <linearGradient id="colorPat" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0d9488" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#0d9488" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                <YAxis hide />
+                <Tooltip 
+                  contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
+                />
+                <Area type="monotone" dataKey="patients" stroke="#0d9488" strokeWidth={3} fillOpacity={1} fill="url(#colorPat)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-l-4 border-l-orange-500">
-            <h3 className="text-sm font-bold text-gray-400 mb-1">Pending Appointments</h3>
-            <p className="text-2xl font-bold text-slate-800">16</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-l-4 border-l-green-500">
-            <h3 className="text-sm font-bold text-gray-400 mb-1">Weekly Revenue</h3>
-            <p className="text-2xl font-bold text-slate-800">ETB 45,200</p>
-          </div>
-        </div>
+        </motion.div>
 
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Patient Flow Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <h3 className="text-lg font-bold mb-6 text-slate-800">Patient Flow (This Week)</h3>
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} />
-                  <Tooltip cursor={{fill: 'transparent'}} />
-                  <Bar dataKey="patients" fill="#1e40af" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm"
+        >
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-lg font-bold text-gray-900">Revenue Growth</h3>
+            <BarChart3 className="text-emerald-500" />
+          </div>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                <YAxis hide />
+                <Tooltip 
+                  cursor={{fill: '#f8fafc'}}
+                  contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
+                />
+                <Bar dataKey="revenue" fill="#10b981" radius={[10, 10, 10, 10]} barSize={24} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Quick Access Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { title: 'User Management', count: '1.2k Users', color: 'bg-blue-50 text-blue-600' },
+          { title: 'Doctor Onboarding', count: '4 Pending', color: 'bg-orange-50 text-orange-600' },
+          { title: 'Billing Reports', count: 'Monthly Export', color: 'bg-emerald-50 text-emerald-600' }
+        ].map((item, idx) => (
+          <button key={idx} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between hover:scale-[1.02] transition-transform">
+            <div className="flex items-center gap-4">
+              <div className={`p-3 rounded-2xl ${item.color}`}>
+                <Settings size={20} />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-gray-900 text-sm">{item.title}</p>
+                <p className="text-xs text-gray-400">{item.count}</p>
+              </div>
             </div>
-          </div>
-
-          {/* Revenue Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <h3 className="text-lg font-bold mb-6 text-slate-800">Revenue Trend (ETB)</h3>
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="revenue" stroke="#16a34a" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      </main>
+            <ArrowUpRight size={18} className="text-gray-300" />
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
