@@ -50,16 +50,37 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
 
-  const menuItems = [
-    { icon: LayoutDashboard, label: t('dashboard.menu.overview'), to: '/patient/dashboard' },
-    { icon: Calendar, label: t('dashboard.menu.appointments'), to: '/patient/appointments' },
-    { icon: FileText, label: t('dashboard.menu.records'), to: '/patient/records' },
-    { icon: Users, label: t('dashboard.menu.doctors'), to: '/patient/doctors' },
-    { icon: MessageSquare, label: t('dashboard.menu.aiAssistant'), to: '/patient/ai' },
-    { icon: Bell, label: t('dashboard.menu.notifications'), to: '/patient/notifications' },
-    { icon: CreditCard, label: t('dashboard.menu.billing'), to: '/patient/billing' },
-    { icon: Settings, label: t('dashboard.menu.settings'), to: '/patient/settings' },
-  ];
+  const getMenuItems = () => {
+    switch (user?.role) {
+      case 'Doctor':
+        return [
+          { icon: LayoutDashboard, label: t('dashboard.menu.overview'), to: '/doctor/dashboard' },
+          { icon: Calendar, label: t('dashboard.menu.appointments'), to: '/doctor/appointments' },
+          { icon: Users, label: t('dashboard.menu.doctors'), to: '/doctor/profile' },
+          { icon: Settings, label: t('dashboard.menu.settings'), to: '/doctor/settings' },
+        ];
+      case 'Admin':
+        return [
+          { icon: LayoutDashboard, label: t('dashboard.menu.overview'), to: '/admin/dashboard' },
+          { icon: Users, label: t('dashboard.menu.doctors'), to: '/admin/users' },
+          { icon: Activity, label: t('dashboard.menu.billing'), to: '/admin/system' },
+          { icon: Settings, label: t('dashboard.menu.settings'), to: '/admin/settings' },
+        ];
+      default:
+        return [
+          { icon: LayoutDashboard, label: t('dashboard.menu.overview'), to: '/patient/dashboard' },
+          { icon: Calendar, label: t('dashboard.menu.appointments'), to: '/patient/appointments' },
+          { icon: FileText, label: t('dashboard.menu.records'), to: '/patient/records' },
+          { icon: Users, label: t('dashboard.menu.doctors'), to: '/patient/doctors' },
+          { icon: MessageSquare, label: t('dashboard.menu.aiAssistant'), to: '/patient/ai' },
+          { icon: Bell, label: t('dashboard.menu.notifications'), to: '/patient/notifications' },
+          { icon: CreditCard, label: t('dashboard.menu.billing'), to: '/patient/billing' },
+          { icon: Settings, label: t('dashboard.menu.settings'), to: '/patient/settings' },
+        ];
+    }
+  };
+
+  const menuItems = getMenuItems();
 
   return (
     <>

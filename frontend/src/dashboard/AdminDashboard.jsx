@@ -8,7 +8,8 @@ import {
   ArrowUpRight, 
   Settings, 
   ShieldCheck,
-  BarChart3
+  BarChart3,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import StatCard from '../components/dashboard/StatCard';
