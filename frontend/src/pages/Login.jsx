@@ -29,8 +29,11 @@ const Login = () => {
 
       if (response.ok && data.success) {
         login(data.data, data.data.token);
-        if (data.data.role === 'Admin') navigate('/admin/dashboard');
-        else if (data.data.role === 'Doctor') navigate('/doctor/dashboard');
+        const role = data.data.role?.toLowerCase();
+        console.log("Logged in with role:", role);
+        
+        if (role === 'admin') navigate('/admin/dashboard');
+        else if (role === 'doctor') navigate('/doctor/dashboard');
         else navigate('/patient/dashboard');
       } else {
         setError(data.message || 'Login failed. Please try again.');

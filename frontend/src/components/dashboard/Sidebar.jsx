@@ -51,8 +51,8 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
 
   const getMenuItems = () => {
-    switch (user?.role) {
-      case 'Doctor':
+    switch (user?.role?.toLowerCase()) {
+      case 'doctor':
         return [
           { icon: LayoutDashboard, label: t('dashboard.menu.overview'), to: '/doctor/dashboard' },
           { icon: Calendar, label: t('dashboard.menu.appointments'), to: '/doctor/appointments' },
@@ -60,7 +60,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           { icon: Users, label: t('dashboard.menu.doctors'), to: '/doctor/profile' },
           { icon: Settings, label: t('dashboard.menu.settings'), to: '/doctor/settings' },
         ];
-      case 'Admin':
+      case 'admin':
         return [
           { icon: LayoutDashboard, label: t('dashboard.menu.overview'), to: '/admin/dashboard' },
           { icon: Users, label: 'Manage Doctors', to: '/admin/users' },

@@ -1,58 +1,57 @@
-# 🏥 Sheger Health Connect — AI-Powered Healthcare Management Platform
+# 🏥 Sheger Health Connect
 
-## Overview
-Sheger Health Connect is a production-ready, AI-powered digital healthcare management platform designed specifically for Ethiopian clinics and hospitals. It offers a scalable full-stack healthcare ecosystem featuring modern UI/UX, robust authentication, comprehensive appointment workflows, analytical dashboards, multilingual support, and an AI health assistant.
+A professional, full-stack healthcare management system designed for medical specialists and patients in Addis Ababa, Ethiopia. Built with a focus on role-based security, AI-assisted triage, and premium user experience.
 
-## Features
-- **Public Clinic Website**: Modern, glassmorphism-inspired public pages showcasing services, clinic info, and emergency contacts.
-- **Multilingual Support**: Available in English, Amharic, and Afaan Oromo.
-- **Role-Based Dashboards**: Tailored workspaces for Patients, Doctors, Receptionists, and Admins.
-- **Appointment System**: Real-time scheduling with doctor, department, and availability selection.
-- **Medical Records**: Structured digital records tracking allergies, diagnoses, prescriptions, and lab results.
-- **Enterprise Analytics**: Admin dashboard with Recharts-powered analytics for revenue, patient growth, and department demand.
-- **AI Health Assistant**: Gemini API integration for symptom guidance and clinic FAQs.
+## 🚀 Key Features
 
-## Tech Stack
-- **Frontend**: React, Vite, JavaScript, Tailwind CSS, Shadcn UI, React Router, React Query, Recharts.
-- **Backend**: Node.js, Express.js, JWT Authentication.
-- **Database**: MySQL/PostgreSQL (configured via backend).
-- **AI Integration**: Google Gemini API.
+### 👤 User Roles
+- **Admin**: Full control over user onboarding (Doctors/Patients), system monitoring, and financial tracking.
+- **Doctor**: Personalized clinical workspace to manage appointments, view assigned patients, and communicate with administration.
+- **Patient**: Secure portal to browse specialists, book consultations, and interact with the AI Triage Assistant.
 
-## Folder Structure
-```txt
-src/
- ├── components/
- ├── pages/
- ├── layouts/
- ├── dashboard/
- ├── services/
- ├── hooks/
- ├── context/
- ├── routes/
- ├── utils/
- ├── api/
- ├── assets/
- ├── translations/
+### 🛠️ Core Modules
+- **Doctor Management**: Integrated onboarding system with hashed credentials and specialization mapping.
+- **AI Triage Assistant**: Intelligent health advisor (powered by GPT-4) with local fallback support for continuous availability.
+- **System Logs**: Real-time monitoring of server health, database connectivity, and security events.
+- **Payment Tracking**: Hospital revenue management system for tracking patient transactions.
 
-backend/
- ├── controllers/
- ├── routes/
- ├── middleware/
- ├── models/
- ├── config/
- ├── utils/
- ├── services/
- └── database/
+## 💻 Tech Stack
+- **Frontend**: React.js, Tailwind CSS, Framer Motion (Animations), Lucide React (Icons).
+- **Backend**: Node.js, Express, Sequelize (ORM), Socket.io (Real-time).
+- **Database**: MySQL.
+- **Security**: JWT Authentication, bcrypt password hashing, Role-Based Access Control (RBAC).
+
+## ⚙️ Setup & Installation
+
+### 1. Prerequisites
+- Node.js (v18+)
+- MySQL Server
+
+### 2. Backend Setup
+```bash
+cd backend
+npm install
+# Configure .env with your DB credentials and OpenAI Key
+npm run dev
 ```
 
-## Installation & Setup
-1. Clone the repository.
-2. Run `npm install` to install frontend dependencies.
-3. Start the frontend server with `npm run dev`.
+### 3. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-*(Backend setup and API configurations will be detailed in `docs/SETUP_GUIDE.md`)*
+### 4. Seeding Admin
+To create the initial system administrator, run:
+```bash
+cd backend
+node seed-admin.js
+```
+**Default Admin**: `admin` / `Admin@2026`
 
-## Future Roadmap
-- Integration with external labs and pharmacies.
-- Telemedicine video consultation support.
-- Mobile application using React Native.
+## 📊 System Architecture
+The application uses a modular MVC-style architecture on the backend with a clear separation of concerns between models, controllers, and routes. The frontend follows a component-based design with centralized state management via `AuthContext`.
+
+---
+© 2026 Sheger Health. Developed by Gemachis Tesfaye.

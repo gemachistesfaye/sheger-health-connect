@@ -9,12 +9,14 @@ const ProtectedRoute = ({ allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  const userRole = user.role?.toLowerCase();
+  const normalizedAllowedRoles = allowedRoles.map(r => r.toLowerCase());
+
+  if (allowedRoles && !normalizedAllowedRoles.includes(userRole)) {
     // Logged in but incorrect role
-    // Redirect to their respective dashboard
-    if (user.role === 'Admin') return <Navigate to="/admin/dashboard" replace />;
-    if (user.role === 'Doctor') return <Navigate to="/doctor/dashboard" replace />;
-    if (user.role === 'Patient') return <Navigate to="/patient/dashboard" replace />;
+    if (userRole === 'admin') return <Navigate to="/admin/dashboard" replace />;
+    if (userRole === 'doctor') return <Navigate to="/doctor/dashboard" replace />;
+    if (userRole === 'patient') return <Navigate to="/patient/dashboard" replace />;
     return <Navigate to="/" replace />;
   }
 
