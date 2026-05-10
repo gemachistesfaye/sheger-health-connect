@@ -21,31 +21,58 @@ const DoctorManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const { token } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newDoctor, setNewDoctor] = useState({ full_name: '', username: '', password: '', specialization: 'General' });
 
-  // Fetch doctors from real backend
+  // Fetch doctors
+  const fetchDoctors = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/admin/doctors', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success) setDoctors(data.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchDoctors = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch('http://localhost:5000/api/admin/doctors', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        if (data.success) {
-          setDoctors(data.data);
-        }
-      } catch (error) {
-        console.error('Fetch error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     if (token) fetchDoctors();
   }, [token]);
 
+  const handleOnboard = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('http://localhost:5000/api/admin/doctors', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newDoctor)
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Doctor onboarded successfully!');
+        setIsModalOpen(false);
+        setNewDoctor({ full_name: '', username: '', password: '', specialization: 'General' });
+        fetchDoctors();
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('Network error');
+    }
+  };
+
   const filteredDoctors = doctors.filter(doc => 
-    doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.email.toLowerCase().includes(searchTerm.toLowerCase())
+    (doc.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     doc.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     doc.email?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -55,11 +82,90 @@ const DoctorManagement = () => {
           <h1 className="text-3xl font-black text-gray-900 tracking-tight">Doctor Management</h1>
           <p className="text-gray-500 font-medium">Verified medical professionals on the Sheger Health platform.</p>
         </div>
-        <button className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-2xl font-bold shadow-xl shadow-emerald-600/20 hover:scale-105 transition-transform">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-2xl font-bold shadow-xl shadow-emerald-600/20 hover:scale-105 transition-transform"
+        >
           <UserPlus size={20} />
           Onboard New Doctor
         </button>
       </div>
+
+      {/* Onboarding Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white w-full max-w-lg rounded-[40px] p-10 shadow-2xl relative"
+          >
+            <h2 className="text-2xl font-black text-gray-900 mb-2">Onboard Specialist</h2>
+            <p className="text-gray-500 mb-8 font-medium">Create a new doctor account for the platform.</p>
+            
+            <form onSubmit={handleOnboard} className="space-y-4">
+               <div className="space-y-1">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Full Name</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm font-medium" 
+                    value={newDoctor.full_name}
+                    onChange={(e) => setNewDoctor({...newDoctor, full_name: e.target.value})}
+                    required 
+                  />
+               </div>
+               <div className="space-y-1">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Username</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm font-medium" 
+                    value={newDoctor.username}
+                    onChange={(e) => setNewDoctor({...newDoctor, username: e.target.value})}
+                    required 
+                  />
+               </div>
+               <div className="space-y-1">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Password</label>
+                  <input 
+                    type="password" 
+                    className="w-full bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm font-medium" 
+                    value={newDoctor.password}
+                    onChange={(e) => setNewDoctor({...newDoctor, password: e.target.value})}
+                    required 
+                  />
+               </div>
+               <div className="space-y-1">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Specialization</label>
+                  <select 
+                    className="w-full bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 text-sm font-medium"
+                    value={newDoctor.specialization}
+                    onChange={(e) => setNewDoctor({...newDoctor, specialization: e.target.value})}
+                  >
+                    <option value="General">General Consultation</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                    <option value="Neurology">Neurology</option>
+                  </select>
+               </div>
+               
+               <div className="flex gap-4 pt-4">
+                  <button 
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="flex-1 py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-emerald-600/20"
+                  >
+                    Onboard Now
+                  </button>
+               </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4">
