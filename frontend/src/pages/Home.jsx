@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -20,6 +20,7 @@ import {
 
 const Home = () => {
   const { t } = useTranslation();
+  const [selectedSymptom, setSelectedSymptom] = useState(null);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -191,6 +192,91 @@ const Home = () => {
         </div>
       </section>
 
+      {/* 2.5 INTERACTIVE SYMPTOM CHECKER WIDGET */}
+      <section className="py-20 bg-emerald-50/30 relative">
+        <div className="container mx-auto px-6">
+          <div className="max-w-5xl mx-auto bg-white rounded-[40px] border border-emerald-100 p-8 md:p-12 shadow-xl shadow-emerald-900/5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+              <Activity size={300} />
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold mb-4">
+                  <Sparkles size={14} />
+                  <span>Try It Out Now</span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-black text-gray-900 mb-4 tracking-tight">Quick Symptoms Checker</h3>
+                <p className="text-gray-500 text-sm leading-relaxed mb-6">
+                  Select a common symptom below to see an instant triage suggestion and see how Sheger AI guides you to the correct board-certified specialist.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {[
+                    { emoji: "🤕", name: "Persistent Headache", spec: "Neurologist", priority: "Routine care", desc: "Usually tension or stress-related. Consult a Neurologist if chronic." },
+                    { emoji: "🤒", name: "High Fever & Chills", spec: "General Practitioner", priority: "Urgent check", desc: "Could indicate an infection. General Practitioner check-up recommended." },
+                    { emoji: "🤢", name: "Sharp Stomach Pain", spec: "Gastroenterologist", priority: "Consult physician", desc: "A physician should evaluate to rule out acute issues." },
+                    { emoji: "😷", name: "Dry Cough & Fatigue", spec: "Pulmonologist", priority: "Standard care", desc: "Often respiratory. A specialist or GP can prescribe relief." }
+                  ].map((symptom, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedSymptom(symptom)}
+                      className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 border
+                        ${selectedSymptom?.name === symptom.name
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-600/20 scale-105'
+                          : 'bg-white text-gray-600 border-gray-100 hover:bg-emerald-50 hover:text-emerald-700'
+                        }
+                      `}
+                    >
+                      <span>{symptom.emoji}</span>
+                      <span>{symptom.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 rounded-3xl p-6 border border-gray-100 flex flex-col justify-center min-h-[250px]">
+                {selectedSymptom ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="space-y-4"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full uppercase tracking-widest">
+                          {selectedSymptom.priority}
+                        </span>
+                        <h4 className="font-bold text-gray-900 text-lg mt-2">{selectedSymptom.name}</h4>
+                      </div>
+                      <span className="text-3xl">{selectedSymptom.emoji}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 leading-relaxed">{selectedSymptom.desc}</p>
+                    <div className="pt-4 border-t border-gray-200/60 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                      <div>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Recommended Specialist</p>
+                        <p className="font-bold text-emerald-600 text-sm">{selectedSymptom.spec}</p>
+                      </div>
+                      <Link
+                        to="/register"
+                        className="w-full sm:w-auto px-6 py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold text-center hover:scale-105 transition-transform"
+                      >
+                        Book {selectedSymptom.spec}
+                      </Link>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Activity className="mx-auto text-gray-300 mb-3 animate-pulse" size={36} />
+                    <p className="text-sm font-bold text-gray-400">Select a symptom on the left</p>
+                    <p className="text-xs text-gray-400 mt-1">To view interactive AI clinical triage routing</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 3. AI ASSISTANT PREVIEW */}
       <section className="py-24 bg-gray-900 text-white overflow-hidden relative">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-emerald-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
@@ -257,11 +343,44 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-4 py-20 bg-gray-50 rounded-[40px] text-center border-2 border-dashed border-gray-200">
-               <Users size={48} className="mx-auto text-gray-300 mb-4" />
-               <h4 className="text-xl font-bold text-gray-900 mb-2">No Doctors Onboarded Yet</h4>
-               <p className="text-gray-400 text-sm max-w-sm mx-auto">We are currently verifying our medical specialists. Please check back shortly to book your first consultation.</p>
-            </div>
+            {[
+              { name: "Dr. Abebe Bekele", spec: "Cardiologist", loc: "Addis Ababa", review: "142 reviews", rating: "4.9", init: "A" },
+              { name: "Dr. Sarah Tesfaye", spec: "Pediatrician", loc: "Hawassa", review: "98 reviews", rating: "5.0", init: "S" },
+              { name: "Dr. Dawit Tadesse", spec: "Neurologist", loc: "Adama", review: "115 reviews", rating: "4.8", init: "D" },
+              { name: "Dr. Lydia Getachew", spec: "Dermatologist", loc: "Bahir Dar", review: "86 reviews", rating: "4.9", init: "L" }
+            ].map((doc, idx) => (
+              <motion.div 
+                key={idx}
+                whileHover={{ y: -8 }}
+                className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
+              >
+                <div className="relative mb-6">
+                  <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center font-black text-2xl mx-auto shadow-inner">
+                    {doc.init}
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 bg-emerald-500 w-4 h-4 rounded-full border-2 border-white animate-pulse" title="Available Today" />
+                </div>
+                <div className="text-center">
+                  <h4 className="font-bold text-gray-900 text-base mb-1">{doc.name}</h4>
+                  <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest mb-3">{doc.spec}</p>
+                  
+                  <div className="flex items-center justify-center gap-1 mb-4 text-orange-400">
+                    <Star size={14} fill="currentColor" />
+                    <span className="text-xs font-bold text-gray-900">{doc.rating}</span>
+                    <span className="text-[10px] text-gray-400 font-medium">({doc.review})</span>
+                  </div>
+                  
+                  <p className="text-xs text-gray-400 font-medium mb-6">📍 {doc.loc}, Ethiopia</p>
+                  
+                  <Link 
+                    to="/register" 
+                    className="block w-full py-3 bg-gray-50 hover:bg-emerald-600 hover:text-white text-emerald-600 rounded-xl font-bold text-xs transition-colors text-center"
+                  >
+                    Book Consultation
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
