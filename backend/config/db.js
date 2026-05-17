@@ -1,7 +1,8 @@
 const { Sequelize } = require('sequelize');
 const path = require('path');
 
-const isSqlite = process.env.USE_SQLITE === 'true';
+// Automatically default to SQLite if USE_SQLITE is 'true' OR if connecting to the expired Aiven cloud host
+const isSqlite = process.env.USE_SQLITE === 'true' || (process.env.DB_HOST && process.env.DB_HOST.includes('aivencloud.com')) || !process.env.DB_HOST;
 
 const sequelize = isSqlite
   ? new Sequelize({
