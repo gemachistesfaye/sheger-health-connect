@@ -1,6 +1,10 @@
 const Appointment = require('../models/Appointment');
 const User = require('../models/User');
 
+// Define associations dynamically
+Appointment.belongsTo(User, { as: 'Patient', foreignKey: 'patient_id' });
+Appointment.belongsTo(User, { as: 'Doctor', foreignKey: 'doctor_id' });
+
 // @desc    Book a new appointment
 // @route   POST /api/appointments
 // @access  Private (Patient/Admin)
@@ -53,12 +57,30 @@ const getAppointments = async (req, res) => {
     let appointments;
 
     if (req.user.role === 'Patient') {
-      appointments = await Appointment.findAll({ where: { patient_id: req.user.id } });
+      appointments = await Appointment.findAll({ 
+        where: { patient_id: req.user.id },
+        include: [
+          { model: User, as: 'Doctor', attributes: ['id', 'full_name', 'specialization'] }
+        ],
+        order: [['appointment_date', 'ASC'], ['appointment_time', 'ASC']]
+      });
     } else if (req.user.role === 'Doctor') {
-      appointments = await Appointment.findAll({ where: { doctor_id: req.user.id } });
+      appointments = await Appointment.findAll({ 
+        where: { doctor_id: req.user.id },
+        include: [
+          { model: User, as: 'Patient', attributes: ['id', 'full_name', 'phone', 'email'] }
+        ],
+        order: [['appointment_date', 'ASC'], ['appointment_time', 'ASC']]
+      });
     } else {
       // Admin/Receptionist sees all
-      appointments = await Appointment.findAll();
+      appointments = await Appointment.findAll({
+        include: [
+          { model: User, as: 'Patient', attributes: ['id', 'full_name'] },
+          { model: User, as: 'Doctor', attributes: ['id', 'full_name'] }
+        ],
+        order: [['appointment_date', 'ASC'], ['appointment_time', 'ASC']]
+      });
     }
 
     res.json({ success: true, data: appointments });

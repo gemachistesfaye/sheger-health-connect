@@ -32,6 +32,18 @@ const getMessagesWithUser = async (req, res) => {
     const otherUserId = req.params.userId;
     const myId = req.user.id;
 
+    // Mark received messages from this user as read
+    await Message.update(
+      { status: 'read' },
+      {
+        where: {
+          sender_id: otherUserId,
+          receiver_id: myId,
+          status: 'unread'
+        }
+      }
+    );
+
     const messages = await Message.findAll({
       where: {
         [Op.or]: [

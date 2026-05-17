@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Search, MoreVertical, Phone, Video, Paperclip, Smile, User, CheckCheck } from 'lucide-react';
+import { Send, Search, MoreVertical, Phone, Video, Paperclip, Smile, User, CheckCheck, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { io } from 'socket.io-client';
 
@@ -18,9 +18,13 @@ const MessageBubble = ({ message, isOwn }) => (
         : 'bg-white text-gray-800 rounded-tl-none border border-gray-100 shadow-sm'
     }`}>
       <p className="text-sm font-medium leading-relaxed">{message.text}</p>
-      <div className={`flex items-center gap-1 mt-2 ${isOwn ? 'text-white/60' : 'text-gray-400'}`}>
+      <div className={`flex items-center gap-1.5 mt-2 ${isOwn ? 'text-white/60' : 'text-gray-400'}`}>
         <span className="text-[10px] font-bold uppercase">{message.time}</span>
-        {isOwn && <CheckCheck size={12} />}
+        {isOwn && (
+          message.status === 'read'
+            ? <CheckCheck size={14} className="text-sky-300" /> // Telegram-style double tick for read
+            : <Check size={14} className="text-white/60" /> // Single tick for unread/sent
+        )}
       </div>
     </div>
   </motion.div>
@@ -76,7 +80,8 @@ const MessagesPage = () => {
           text: newMessage.message,
           time: new Date(newMessage.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           isOwn: false,
-          sender_id: newMessage.sender_id
+          sender_id: newMessage.sender_id,
+          status: newMessage.status || 'unread'
         }];
       });
     });
@@ -111,7 +116,8 @@ const MessagesPage = () => {
             text: m.message,
             time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isOwn: m.sender_id === user.id,
-            sender_id: m.sender_id
+            sender_id: m.sender_id,
+            status: m.status
           }));
           setMessages(formatted);
         }
@@ -138,7 +144,8 @@ const MessagesPage = () => {
       text,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isOwn: true,
-      sender_id: user.id
+      sender_id: user.id,
+      status: 'unread'
     }]);
 
     // Send to backend API

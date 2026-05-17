@@ -16,7 +16,7 @@ import { useLocation } from 'react-router-dom';
 import AppointmentBooking from '../components/AppointmentBooking';
 
 const AppointmentsPage = () => {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const location = useLocation();
   const [appointments, setAppointments] = useState([]);
   const [isBookingOpen, setIsBookingOpen] = useState(location.state?.openBooking || false);
@@ -102,9 +102,16 @@ const AppointmentsPage = () => {
                         </span>
                       </div>
                       <div>
-                        <h4 className="font-bold text-gray-900 text-lg">{app.department}</h4>
+                        <h4 className="font-bold text-gray-900 text-lg">
+                          {user?.role === 'Doctor' 
+                            ? `Patient: ${app.Patient?.full_name || 'Regular Patient'}` 
+                            : `Dr. ${app.Doctor?.full_name || 'Specialist'} (${app.department})`}
+                        </h4>
                         <div className="flex items-center gap-4 mt-1 text-sm text-gray-400 font-medium">
                           <span className="flex items-center gap-1"><Clock size={14} /> {app.appointment_time}</span>
+                          {user?.role === 'Doctor' && app.Patient?.phone && (
+                            <span className="text-xs text-emerald-600 font-bold">📞 {app.Patient.phone}</span>
+                          )}
                           <span className="flex items-center gap-1"><MapPin size={14} /> Sheger Clinic HQ</span>
                         </div>
                       </div>
@@ -150,8 +157,12 @@ const AppointmentsPage = () => {
                       {appointments.filter(a => a.status === 'Completed' || a.status === 'Cancelled').map((app) => (
                         <tr key={app.id} className="hover:bg-gray-50/30 transition-colors">
                           <td className="px-8 py-6">
-                             <p className="font-bold text-gray-900">{app.department}</p>
-                             <p className="text-xs text-gray-400">Regular Visit</p>
+                             <p className="font-bold text-gray-900">
+                               {user?.role === 'Doctor' 
+                                 ? app.Patient?.full_name || 'Regular Patient' 
+                                 : `Dr. ${app.Doctor?.full_name || 'Specialist'}`}
+                             </p>
+                             <p className="text-xs text-gray-400">{app.department}</p>
                           </td>
                           <td className="px-8 py-6">
                             <p className="text-sm font-medium text-gray-600">{new Date(app.appointment_date).toLocaleDateString()}</p>
