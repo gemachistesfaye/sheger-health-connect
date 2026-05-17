@@ -61,8 +61,14 @@ const MessagesPage = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [socket, setSocket] = useState(null);
-  const [activeTab, setActiveTab] = useState('Doctor');
+  const [activeTab, setActiveTab] = useState(user?.role === 'Admin' ? 'Doctor' : 'Patient');
   const messagesEndRef = useRef(null);
+  const activeContactIdRef = useRef(null);
+
+  // Sync active contact ref to prevent stale closure in socket listener
+  useEffect(() => {
+    activeContactIdRef.current = activeContactId;
+  }, [activeContactId]);
 
   // Initialize Socket and Fetch Contacts
   useEffect(() => {
@@ -76,20 +82,30 @@ const MessagesPage = () => {
 
     // Listen for incoming messages
     newSocket.on('receiveMessage', (newMessage) => {
-      // If the message is from the currently active contact, append it
-      setMessages(prev => {
-        // We only append if it's relevant to the current chat room we have open.
-        // Actually, let's just re-fetch or append directly if it matches.
-        return [...prev, {
-          id: newMessage.id,
-          text: newMessage.message,
-          time: new Date(newMessage.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          isOwn: newMessage.sender_id === user.id,
-          sender_id: newMessage.sender_id,
-          status: newMessage.status || 'unread',
-          sender_name: newMessage.Sender?.full_name
-        }];
-      });
+      const activeContactId = activeContactIdRef.current;
+      
+      // Check if this message belongs to the currently active chat
+      const isGroupMsg = Number(newMessage.receiver_id) === 0;
+      const isForActiveChat = isGroupMsg 
+        ? (activeContactId === 0)
+        : (activeContactId === newMessage.sender_id || newMessage.sender_id === user.id);
+        
+      if (isForActiveChat) {
+        setMessages(prev => {
+          // Avoid duplicate messages if already present
+          if (prev.some(m => m.id === newMessage.id)) return prev;
+          
+          return [...prev, {
+            id: newMessage.id,
+            text: newMessage.message,
+            time: new Date(newMessage.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isOwn: newMessage.sender_id === user.id,
+            sender_id: newMessage.sender_id,
+            status: newMessage.status || 'unread',
+            sender_name: newMessage.Sender?.full_name
+          }];
+        });
+      }
     });
 
     // Fetch contacts
@@ -211,7 +227,7 @@ const MessagesPage = () => {
               />
            </div>
 
-           {user?.role === 'Admin' && (
+            {user?.role === 'Admin' && (
              <div className="flex gap-2 bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
                <button
                  onClick={() => {
@@ -239,13 +255,42 @@ const MessagesPage = () => {
                </button>
              </div>
            )}
+
+           {user?.role === 'Doctor' && (
+             <div className="flex gap-2 bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
+               <button
+                 onClick={() => {
+                   setActiveTab('Patient');
+                   const pats = contacts.filter(c => c.role === 'Patient');
+                   if (pats.length > 0) setActiveContactId(pats[0].id);
+                 }}
+                 className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                   activeTab === 'Patient' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                 }`}
+               >
+                 Patients
+               </button>
+               <button
+                 onClick={() => {
+                   setActiveTab('Staff Group');
+                   const groups = contacts.filter(c => c.role === 'Staff Group');
+                   if (groups.length > 0) setActiveContactId(groups[0].id);
+                 }}
+                 className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                   activeTab === 'Staff Group' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                 }`}
+               >
+                 Clinical Groups
+               </button>
+             </div>
+           )}
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar">
-           {contacts.filter(c => user?.role !== 'Admin' || c.role === activeTab).length === 0 ? (
+           {contacts.filter(c => user?.role === 'Patient' || c.role === activeTab).length === 0 ? (
              <div className="text-center text-gray-400 p-4 text-sm font-medium">No contacts found.</div>
            ) : (
              contacts
-               .filter(c => user?.role !== 'Admin' || c.role === activeTab)
+               .filter(c => user?.role === 'Patient' || c.role === activeTab)
                .map((contact) => (
                  <ChatSidebarItem 
                     key={contact.id} 
