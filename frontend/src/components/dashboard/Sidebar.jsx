@@ -34,13 +34,6 @@ const SidebarItem = ({ icon: Icon, label, to, onClick }) => {
         <>
           <Icon size={22} className={isActive ? 'text-white' : 'group-hover:scale-110 transition-transform'} />
           <span className="font-bold text-sm tracking-tight">{label}</span>
-          {isActive && (
-            <motion.div
-              layoutId="active-pill"
-              className="absolute -right-2 w-1.5 h-8 bg-emerald-600 rounded-full"
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            />
-          )}
         </>
       )}
     </NavLink>
