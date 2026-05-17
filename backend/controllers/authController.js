@@ -22,10 +22,18 @@ const register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide required fields (full_name, username, password)' });
     }
 
-    // Check if user exists
+    // Check if user exists (by username)
     const userExists = await User.findOne({ where: { username } });
     if (userExists) {
       return res.status(400).json({ success: false, message: 'Username is already taken' });
+    }
+
+    // Check if email is already taken
+    if (email) {
+      const emailExists = await User.findOne({ where: { email } });
+      if (emailExists) {
+        return res.status(400).json({ success: false, message: 'Email is already registered' });
+      }
     }
 
     // Hash password
