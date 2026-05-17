@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import ConfirmModal from '../ConfirmModal';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -49,6 +50,7 @@ const SidebarItem = ({ icon: Icon, label, to, onClick }) => {
 const Sidebar = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const getMenuItems = () => {
     switch (user?.role?.toLowerCase()) {
@@ -137,11 +139,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
           {/* Logout */}
           <button
-            onClick={() => {
-              if (window.confirm("Are you sure you want to sign out of Sheger Health Connect?")) {
-                logout();
-              }
-            }}
+            onClick={() => setShowLogoutConfirm(true)}
             className="mt-8 flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500 hover:bg-red-50 transition-all group"
           >
             <LogOut size={22} className="group-hover:-translate-x-1 transition-transform" />
@@ -149,6 +147,17 @@ const Sidebar = ({ isOpen, onClose }) => {
           </button>
         </div>
       </aside>
+
+      <ConfirmModal 
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={logout}
+        title="Sign Out?"
+        message="Are you sure you want to sign out of Sheger Health Connect? We will save your progress and keep your records secure."
+        confirmText="Sign Out"
+        cancelText="Stay Logged In"
+        type="danger"
+      />
     </>
   );
 };

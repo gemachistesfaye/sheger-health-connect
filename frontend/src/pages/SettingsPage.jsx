@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import ConfirmModal from '../components/ConfirmModal';
 import { 
   User, 
   Shield, 
@@ -39,6 +40,7 @@ const SettingsSection = ({ icon: Icon, title, desc, children }) => (
 const SettingsPage = () => {
   const { user, logout } = useAuth();
   const { t, i18n } = useTranslation();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   return (
     <div className="space-y-10">
@@ -149,15 +151,22 @@ const SettingsPage = () => {
               <h4 className="font-black text-gray-900 mb-2 uppercase tracking-tighter">Sign Out</h4>
               <p className="text-xs text-gray-400 leading-relaxed mb-8">Ready to leave? We'll save your progress and keep your records safe.</p>
               <button 
-                onClick={() => {
-                  if (window.confirm("Are you sure you want to sign out of Sheger Health Connect?")) {
-                    logout();
-                  }
-                }} 
+                onClick={() => setShowLogoutConfirm(true)} 
                 className="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-black text-sm hover:bg-red-100 transition-colors"
               >
                  Log Out Now
               </button>
+
+              <ConfirmModal 
+                isOpen={showLogoutConfirm}
+                onClose={() => setShowLogoutConfirm(false)}
+                onConfirm={logout}
+                title="Sign Out?"
+                message="Are you sure you want to sign out of Sheger Health Connect? We will save your progress and keep your records secure."
+                confirmText="Sign Out"
+                cancelText="Stay Logged In"
+                type="danger"
+              />
            </div>
         </div>
       </div>
