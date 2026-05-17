@@ -240,6 +240,10 @@ const resetPassword = async (req, res) => {
 const seedDatabaseTemp = async (req, res) => {
   try {
     const User = require('../models/User');
+    const Message = require('../models/Message');
+
+    // Completely wipe out the Messages table to clean up all messy test messages!
+    await Message.destroy({ where: {} });
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash('Password@123', salt);

@@ -88,7 +88,10 @@ const MessagesPage = () => {
       const isGroupMsg = Number(newMessage.receiver_id) === 0;
       const isForActiveChat = isGroupMsg 
         ? (activeContactId === 0)
-        : (activeContactId === newMessage.sender_id || newMessage.sender_id === user.id);
+        : (
+            (Number(newMessage.sender_id) === Number(activeContactId) && Number(newMessage.receiver_id) === Number(user.id)) ||
+            (Number(newMessage.sender_id) === Number(user.id) && Number(newMessage.receiver_id) === Number(activeContactId))
+          );
         
       if (isForActiveChat) {
         setMessages(prev => {
@@ -101,6 +104,7 @@ const MessagesPage = () => {
             time: new Date(newMessage.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isOwn: newMessage.sender_id === user.id,
             sender_id: newMessage.sender_id,
+            receiver_id: newMessage.receiver_id,
             status: newMessage.status || 'unread',
             sender_name: newMessage.Sender?.full_name
           }];
@@ -155,6 +159,9 @@ const MessagesPage = () => {
   useEffect(() => {
     if (!user || !token || !activeContactId) return;
 
+    // Clear messages state immediately to prevent visual flash of previous chat
+    setMessages([]);
+
     fetch(`${API_URL}/api/messages/history/${activeContactId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -167,6 +174,7 @@ const MessagesPage = () => {
             time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isOwn: m.sender_id === user.id,
             sender_id: m.sender_id,
+            receiver_id: m.receiver_id,
             status: m.status,
             sender_name: m.Sender?.full_name
           }));
@@ -196,6 +204,7 @@ const MessagesPage = () => {
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isOwn: true,
       sender_id: user.id,
+      receiver_id: activeContactId,
       status: 'unread'
     }]);
 
@@ -353,12 +362,28 @@ const MessagesPage = () => {
 
          {/* Messages Area */}
          <div className="flex-1 overflow-y-auto p-8 bg-gray-50/30 no-scrollbar">
-            {messages.filter(m => m.isOwn || m.sender_id === activeContactId).map((msg) => (
-              <MessageBubble key={msg.id} message={msg} isOwn={msg.isOwn} />
-            ))}
-            {messages.length === 0 && activeContact && (
-              <div className="text-center text-gray-400 mt-10 font-medium">No messages yet. Send a message to start the conversation!</div>
-            )}
+            {(() => {
+                const displayMessages = messages.filter(msg => {
+                   if (Number(activeContactId) === 0) {
+                     return Number(msg.receiver_id) === 0;
+                   } else {
+                     return (
+                       (Number(msg.sender_id) === Number(user.id) && Number(msg.receiver_id) === Number(activeContactId)) ||
+                       (Number(msg.sender_id) === Number(activeContactId) && Number(msg.receiver_id) === Number(user.id))
+                     );
+                   }
+                });
+                return (
+                  <>
+                    {displayMessages.map((msg) => (
+                      <MessageBubble key={msg.id} message={msg} isOwn={msg.isOwn} />
+                    ))}
+                    {displayMessages.length === 0 && activeContact && (
+                      <div className="text-center text-gray-400 mt-10 font-medium">No messages yet. Send a message to start the conversation!</div>
+                    )}
+                  </>
+                );
+             })()}
             <div ref={messagesEndRef} />
          </div>
 
