@@ -1,102 +1,170 @@
 # 🏥 Sheger Health Connect
 
-<a href="https://sheger-health-connect.onrender.com" target="_blank">
-  <img src="docs/images/banner.png" width="100%" height="280px" style="object-fit: cover; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); margin-bottom: 24px;" alt="Sheger Health Connect Banner" />
-</a>
+<p align="center">
+  <a href="https://sheger-health-connect.vercel.app" target="_blank">
+    <img src="docs/images/banner.png" width="100%" height="260" style="object-fit:cover; border-radius:16px;" alt="Sheger Health Connect Banner" />
+  </a>
+</p>
 
-## 🌐 Live Deployment
-* **Backend Deployed API (Render)**: [sheger-health-connect.onrender.com](https://sheger-health-connect.onrender.com)
-* **Frontend App (Vercel)**: [sheger-health-connect.vercel.app](https://sheger-health-connect.vercel.app)
+<p align="center">
+  <a href="https://sheger-health-connect.vercel.app"><img src="https://img.shields.io/badge/Live%20App-Vercel-00C7B7?style=for-the-badge&logo=vercel" /></a>
+  <a href="https://sheger-health-connect.onrender.com"><img src="https://img.shields.io/badge/Backend%20API-Render-46E3B7?style=for-the-badge&logo=render" /></a>
+  <img src="https://img.shields.io/badge/Stack-React%20%2B%20Node.js-emerald?style=for-the-badge&logo=react" />
+  <img src="https://img.shields.io/badge/Database-MySQL-blue?style=for-the-badge&logo=mysql" />
+  <img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen?style=for-the-badge" />
+</p>
+
+---
+
+## 🌐 Live Deployments
+| Service | URL |
+|---|---|
+| 🌍 **Frontend App** | [sheger-health-connect.vercel.app](https://sheger-health-connect.vercel.app) |
+| ⚙️ **Backend REST API** | [sheger-health-connect.onrender.com](https://sheger-health-connect.onrender.com) |
+
+---
+
+## 📸 Platform Screenshots
+
+| 🏠 Landing Page | 🔐 Login Gateway | 📝 Registration |
+| :---: | :---: | :---: |
+| <img src="docs/images/img2_landing.png" width="100%" alt="Landing Page" /> | <img src="docs/images/img1_login.png" width="100%" alt="Login Page" /> | <img src="docs/images/img3_register.png" width="100%" alt="Register Page" /> |
+| **🩺 Doctor Dashboard** | **📅 Doctor Appointments** | **💬 Doctor Messages** |
+| <img src="docs/images/img4_doctor_dashboard.png" width="100%" alt="Doctor Dashboard" /> | <img src="docs/images/img5_doctor_schedule.png" width="100%" alt="Doctor Appointments" /> | <img src="docs/images/img6_doctor_chat.png" width="100%" alt="Doctor Chat" /> |
+| **🔑 Admin Dashboard** | **👨‍⚕️ Admin Doctor Manager** | **👤 Patient Experience** |
+| <img src="docs/images/img7_admin_dashboard.png" width="100%" alt="Admin Dashboard" /> | <img src="docs/images/img8_admin_doctors.png" width="100%" alt="Admin Doctors" /> | <img src="docs/images/img9_patient_dashboard.png" width="100%" alt="Patient Dashboard" /> |
+
+---
+
+## 🚀 Key Features
+
+### 👤 Three Role-Based Portals
+
+| Role | Access & Capabilities |
+|---|---|
+| 🔑 **Admin** | Manage all Doctors & Patients, view system logs, track payments, send messages to any user |
+| 🩺 **Doctor** | Manage appointments, view patient histories, isolated direct messaging, group staff chat |
+| 👤 **Patient** | Browse specialists, book consultations, view medical vault, AI triage assistant |
+
+### 🛠️ Core Functional Modules
+- **💬 Isolated Direct Messaging** — Fixed message routing so doctor-patient conversations are fully private with no cross-leak
+- **🤕 Interactive Symptoms Checker** — Smart triage widget guiding patients to the right specialist instantly
+- **🔒 Logout Confirmation Modal** — Prevents accidental session termination with a secure confirm prompt
+- **🧼 Clean Seeder Utility** — Admin-triggered DB reset clears all test data for a pristine environment
+- **🧠 AI Triage (GPT-4)** — Intelligent health consultation with smart offline fallback responses
+- **🌐 Multilingual** — Full English, Amharic (አማርኛ), and Afaan Oromoo support across all UI components
+- **📊 System Analytics** — Real-time charts for appointments, patient counts, and revenue tracking
 
 ---
 
 ## 🛡️ Security Architecture
-Sheger Health prioritizes patient data safety with a multi-layered security approach:
-- **No Public Registration**: Prevents unauthorized access. All user accounts (Doctors/Patients) are created and vetted by the System Administrator.
-- **Advanced Encryption**: All passwords undergo **bcrypt** salted hashing before storage. Plaintext passwords are never stored or logged.
-- **JWT Authentication**: Secure, stateless session management using JSON Web Tokens (24h expiration).
-- **Role-Based Access Control (RBAC)**: Strict separation of privileges. Doctors cannot access admin panels, and patients can only access their personal medical records.
-- **SQL Injection Protection**: All database queries are handled via **Sequelize ORM**, using prepared statements and parameterized queries.
-- **CORS Protection**: Access-Control headers are restricted to authorized frontend origins only.
+
+| Layer | Implementation |
+|---|---|
+| 🔐 **Authentication** | JWT tokens (24h expiry), Username-based login |
+| 🔑 **Authorization** | RBAC — strict role separation enforced on every route |
+| 🔒 **Password Storage** | bcrypt salted hashing — no plaintext ever stored |
+| 🛡️ **SQL Safety** | Sequelize ORM with parameterized queries, no raw SQL |
+| 🌐 **CORS** | Restricted to authorized frontend origins only |
+| 🚫 **Registration** | Public registration disabled — admin-controlled onboarding only |
 
 ---
 
-## 📸 Platform Experiences (Interactive Screenshots Grid)
+## 💻 Tech Stack & Tools
 
-| 🏠 Public Landing Page | 🔑 Authentication Gateway | 🌍 About Clinical Tech |
-| :---: | :---: | :---: |
-| <img src="docs/images/img2_landing.png" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" /> | <img src="docs/images/img1_login.png" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" /> | <img src="docs/images/img3_about.png" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" /> |
-| **👤 Patient Portal** | **🩺 Doctor Portal** | **💬 Doctor Personal Chats** |
-| <img src="docs/images/img9_patient_dashboard.png" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" /> | <img src="docs/images/img4_doctor_dashboard.png" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" /> | <img src="docs/images/img6_doctor_chat.png" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" /> |
-| **📅 Doctor Schedule Workspace** | **🔑 Admin Dashboard Overview** | **🔑 Admin Doctor Manager** |
-| <img src="docs/images/img5_doctor_schedule.png" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" /> | <img src="docs/images/img7_admin_dashboard.png" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" /> | <img src="docs/images/img8_admin_doctors.png" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" /> |
+### Frontend
+| Technology | Purpose |
+|---|---|
+| **React.js (Vite)** | Core SPA framework |
+| **Tailwind CSS** | Utility-first premium styling |
+| **Framer Motion** | Smooth animations & micro-interactions |
+| **i18next** | Multilingual internationalization (EN / AM / OM) |
+| **Lucide React** | Modern medical & dashboard iconography |
+| **Recharts** | Admin analytics & data visualization |
+| **React Router v6** | Client-side routing & protected role-based routes |
+| **Socket.io Client** | Real-time messaging events |
 
----
-
-## 🚀 Key Features & Architectural Milestones
-
-### 👤 User Roles & Dashboard Spaces
-- **🔑 Admin Portal**: Full control over onboarded Doctors/Patients lists, detailed real-time clinical logs, system analytics, and billing transactions tracking.
-- **🩺 Doctor Workspace**: Private workspace to manage client schedules, view assigned patients' detailed health histories, and secure messaging channels.
-- **👤 Patient Workspace**: Secure interface to search for active specialists, manage clinical appointments, and retrieve health summarizing records.
-
-### 🛠️ Core Functional Modules
-- **💬 Isolated Direct Messaging**: Advanced message router that separates Direct Messaging (DM) and Group Chats. Fixed data leaks so that patient-doctor clinical discussions are end-to-end isolated.
-- **🤕 Interactive Symptoms Checker**: A high-fidelity frontend quick checker that guides patients through standard symptoms and recommends the correct board-certified specialist instantly.
-- **🚪 Logout Session Confirmation**: Secure session preservation tool that prevents accidental sign-outs with professional modals.
-- **🧼 Clean Seeder Tool**: Updated DB-seed scripts to automatically clear messaging logs, keeping workspace test-data fully clean.
-- **🧠 Medical GPT-4 AI Triage**: Robust AI consultation helper with smart fallback triggers for high platform availability.
-- **🌐 Dual Multilingual Support**: Live language toggles offering flawless transitions between English, Amharic, and Afaan Oromoo across all components.
-
----
-
-## 💻 Tech Stack & Developer Tools
-
-### Frontend Core
-* **React.js (Vite)**: High-performance single-page app framework.
-* **Tailwind CSS & Vanilla CSS**: Unified aesthetic design tokens using custom HSL themes.
-* **Framer Motion**: Modern spring animations and micro-interaction effects.
-* **i18next**: Strict internationalization framework for local language support.
-* **Lucide React**: Premium medical and dashboard iconography.
-
-### Backend Infrastructure
-* **Node.js & Express**: Clean MVC server-side REST API.
-* **Sequelize (ORM)**: Prepared statements, security constraints, and database structure.
-* **MySQL**: Robust relational database engine.
-* **Socket.io**: Real-time two-way client communication for instant message events.
-* **OpenAI SDK**: Clinical triage GPT-4 integrations.
+### Backend
+| Technology | Purpose |
+|---|---|
+| **Node.js & Express** | REST API server with MVC architecture |
+| **Sequelize ORM** | Schema migrations & safe DB operations |
+| **MySQL** | Relational database for users, appointments & records |
+| **Socket.io** | Bidirectional real-time messaging events |
+| **OpenAI SDK (GPT-4)** | AI triage assistant with fallback support |
+| **bcrypt** | Industry-standard password salting & hashing |
+| **JWT** | Stateless secure session tokens |
+| **Multer** | File & image upload handling |
+| **Nodemailer** | Email notification integration |
 
 ---
 
 ## ⚙️ Local Setup & Installation
 
-### 1. Prerequisites
-* Node.js (v18+)
-* MySQL Server instance running
+### Prerequisites
+- Node.js v18+
+- MySQL Server running locally
 
-### 2. Backend Setup
+### 1. Backend Setup
 ```bash
 cd backend
 npm install
-# Configure your local .env with DB credentials and OpenAI Keys
+
+# Create a .env file with:
+# DB_HOST=localhost
+# DB_USER=root
+# DB_PASS=yourpassword
+# DB_NAME=sheger-health-connect
+# JWT_SECRET=your_secret
+# OPENAI_API_KEY=your_openai_key
+
 npm run dev
 ```
 
-### 3. Frontend Setup
+### 2. Frontend Setup
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### 4. Admin Seeding
-To register the default administrator:
+### 3. Seed the Database
 ```bash
 cd backend
 node seed-admin.js
 ```
-* **Default Admin Credentials**: Username: `admin` | Password: `Admin@2026`
+
+### 4. Default Login Credentials
+| Role | Username | Password |
+|---|---|---|
+| Admin | `admin` | `Admin@2026` |
+| Doctor | `dr_abebe` | `Password@123` |
+| Doctor | `dr_sarah` | `Password@123` |
+| Doctor | `dr_dawit` | `Password@123` |
 
 ---
 
-© 2026 Sheger Health. Designed & Developed by Gemachis Tesfaye. All rights reserved.
+## 📊 System Architecture
+```
+Frontend (React/Vite) ─── REST API ──► Backend (Express/Node.js)
+        │                                        │
+  Socket.io Client ◄──── WebSocket ────► Socket.io Server
+                                                 │
+                                        MySQL (via Sequelize)
+```
+
+---
+
+## 🗂️ Documentation
+All docs are inside the [`docs/`](docs/) folder:
+- [api.md](docs/api.md) — REST API endpoints
+- [database.md](docs/database.md) — Schema & models
+- [deployment.md](docs/deployment.md) — Production deployment guide
+- [features.md](docs/features.md) — Full feature list
+- [installation.md](docs/installation.md) — Setup instructions
+- [progress.md](docs/progress.md) — Development progress log
+- [security.md](docs/security.md) — Security policies
+
+---
+
+<p align="center">© 2026 Sheger Health Connect · Designed & Developed by <strong>Gemachis Tesfaye</strong></p>
