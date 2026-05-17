@@ -230,10 +230,49 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// @desc    Temporary Seed DB Route
+// @route   GET /api/auth/seed-db
+// @access  Public
+const seedDatabaseTemp = async (req, res) => {
+  try {
+    const User = require('../models/User');
+
+    // Wipe the existing Users table
+    await User.destroy({ where: {} });
+
+    // Create passwords
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash('Password@123', salt);
+
+    // Create Admin Account
+    await User.create({
+      full_name: 'System Administrator',
+      username: 'admin',
+      email: 'admin@sheger.care',
+      phone: '0911000000',
+      password_hash: await bcrypt.hash('Admin@2026', salt),
+      role: 'Admin'
+    });
+
+    // Create 3 Doctor Accounts
+    await User.bulkCreate([
+      { full_name: 'Dr. Abebe Bekele', username: 'dr_abebe', email: 'abebe@sheger.care', phone: '0911111111', password_hash, role: 'Doctor', specialization: 'Cardiologist' },
+      { full_name: 'Dr. Sarah Tesfaye', username: 'dr_sarah', email: 'sarah@sheger.care', phone: '0922222222', password_hash, role: 'Doctor', specialization: 'Pediatrician' },
+      { full_name: 'Dr. Dawit Tadesse', username: 'dr_dawit', email: 'dawit@sheger.care', phone: '0933333333', password_hash, role: 'Doctor', specialization: 'Neurologist' }
+    ]);
+
+    res.status(200).json({ success: true, message: 'Database seeded successfully! Admin and 3 Doctors created.' });
+  } catch (error) {
+    console.error('Seed Error:', error);
+    res.status(500).json({ success: false, message: 'Seeding failed' });
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  seedDatabaseTemp
 };
